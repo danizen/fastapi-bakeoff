@@ -1,0 +1,7 @@
+-r requirements.txt
+
+ipdb
+ipython
+mypy
+pytest
+pytest-cov

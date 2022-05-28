@@ -72,11 +72,6 @@
             <arg value="-t" />
             <arg value="dist" />
             <!--
-                Allows us to cross install without Docker, even on Windows
-            -->
-            <arg value="--platform=linux_x86_64" />
-            <arg value="--only-binary=:all:" />
-            <!--
                 These are our dependencies
             -->
             <arg value="-r" />

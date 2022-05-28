@@ -1,7 +1,8 @@
 -r requirements.txt
 
-ipdb
+cfn-lint		# Validate CloudFormation templates
+ipdb			# Debug and develop
 ipython
-mypy
-pytest
+mypy			# Test typings if needed
+pytest          # Run unit tests
 pytest-cov

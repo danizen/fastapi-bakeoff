@@ -66,23 +66,22 @@
         <exec executable="python" dir="${basedir}" failonerror="true">
             <arg value="-mpip" />
             <arg value="install" />
+            <!--
+                The dist directory will hold packages for Lambda
+            -->
             <arg value="-t" />
             <arg value="dist" />
+            <!--
+                Allows us to cross install without Docker, even on Windows
+            -->
+            <arg value="--platform=linux_x86_64" />
+            <arg value="--only-binary=:all:" />
+            <!--
+                These are our dependencies
+            -->
             <arg value="-r" />
             <arg value="${deps.file}" />
         </exec>
-        <fileset dir="${basedir}/dist" id="dist.binaries">
-            <include name="**/*.pyd"/>
-            <include name="**/*.so"/>
-        </fileset>
-        <pathconvert
-            refid="dist.binaries"
-            property="dist.hasBinaryFiles"
-            pathsep=", "
-            setonempty="false"/>
-        <fail
-            message="dist contains binary files"
-            if="dist.hasBinaryFiles"/>        
     </target>
 
     <target name="package" depends="pip"
@@ -102,7 +101,10 @@
         </zip>
     </target>
 
-    <target name="build" depends="clean, lint, test, package"
+    <!--
+        Not ready yet for "lint" target
+    -->
+    <target name="build" depends="clean, test, package"
             description="--> Test and Construct a Zip file for deployment to Amazon S3"/>
 
     <!--

@@ -5,8 +5,16 @@ from fastapi import FastAPI, Depends
 
 from .schema import Version, Contact
 from .database import DataAccess
+from .config import Settings, get_settings
 
+
+settings = get_settings()
 app = FastAPI()
+
+
+@app.on_event('startup')
+async def startup():
+    app.state.pool = settings.database_url
 
 
 @app.get('/version', response_model=Version)
@@ -21,6 +29,8 @@ def get_fibonacci(number: PositiveInt):
 
 @app.get('/contacts/', response_model=List[Contact])
 def list_contacts(dao=Depends(DataAccess)):
+    import pdb
+    pdb.set_trace()
     return dao.list_contacts()
 
 

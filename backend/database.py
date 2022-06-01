@@ -3,6 +3,15 @@ from .schema import Contact, ContactType
 
 
 class DataAccess:
+    # Singleton pattern
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = object.__new__(cls)
+            cls._instance.__init__(cls._instance, *args, **kwargs)
+        return cls._instance
+
     def __init__(self, seed: int = 0):
         self.contact_types = [
             ContactType(type_id=1, type_name='Friends'),

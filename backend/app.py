@@ -4,7 +4,7 @@ from pydantic import PositiveInt
 from fastapi import FastAPI, Depends
 
 from .schema import Version, Contact
-from .database import DataAccess
+from .database import ContactsService
 from .config import Settings, get_settings
 
 
@@ -28,12 +28,12 @@ def get_fibonacci(number: PositiveInt):
 
 
 @app.get('/contacts/', response_model=List[Contact])
-def list_contacts(dao=Depends(DataAccess)):
+def list_contacts(dao=Depends(ContactsService)):
     import pdb
     pdb.set_trace()
     return dao.list_contacts()
 
 
 @app.get('/contacts/<contact_id>/', response_model=Contact)
-def retrieve_contact(contact_id: PositiveInt, dao=Depends(DataAccess)):
+def retrieve_contact(contact_id: PositiveInt, dao=Depends(ContactsService)):
     return dao.get_contact(contact_id)

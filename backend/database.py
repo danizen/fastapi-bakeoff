@@ -2,14 +2,15 @@ from faker import Faker
 from .schema import Contact, ContactType
 
 
-class DataAccess:
-    def __init__(self, seed: int = 0):
+class ContactsService:
+    def __init__(self, pool):
+        self.pool = pool
         self.contact_types = [
             ContactType(type_id=1, type_name='Friends'),
             ContactType(type_id=2, type_name='Relatives'),
             ContactType(type_id=3, type_name='Coworkers')
         ]
-        faker = Faker(seed)
+        faker = Faker(0)
         num_contacts = faker.random.randint(10, 100)
         contacts = []
         for contact_id in range(1, num_contacts+1):

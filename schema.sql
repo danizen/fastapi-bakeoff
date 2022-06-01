@@ -4,6 +4,9 @@ CREATE TABLE contact_types (
 	type_name VARCHAR2(30)
 );
 
+INSERT INTO contact_types (type_name) 
+VALUES ('Relatives'), ('Friends'), ('Colleagues');
+
 
 CREATE TABLE contacts (
 	contact_id SERIAL PRIMARY KEY,

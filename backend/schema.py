@@ -12,7 +12,7 @@ class ContactType(BaseModel):
 
 
 class Contact(BaseModel):
-    contact_id: PositiveInt
+    contact_id: Optional[PositiveInt]
     first_name: str
     last_name: str
     contact_type: ContactType

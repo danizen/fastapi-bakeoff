@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 import asyncio
-import os
 import sys
 from argparse import ArgumentParser, ArgumentTypeError
+from textwrap import dedent
 
+import asyncpg
 import uvicorn
 from faker import Faker
 
@@ -38,15 +39,48 @@ def command_migrate(opts):
     return 1
 
 
-async def make_data(seed, contacts):
-    faker = Faker(seed) if seed else Faker()
-    for _ in range(contacts):
-        print(faker.first_name())
+def make_contact(faker, contact_types):
+    first_name = faker.first_name()
+    last_name = faker.last_name()
+    type_id = faker.random.choice(contact_types)
+    if faker.random.random() < 0.4:
+        phone_number = faker.phone_number()
+    else:
+        phone_number = None
+    if faker.random.random() < 0.7:
+        email = faker.email()
+    else:
+        email = None
+    return [first_name, last_name, type_id, phone_number, email]
+
+
+async def make_data(seed=0, num_contacts=10):
+    settings = get_settings()
+    params = settings.connect_params()
+    faker = Faker(seed)
+    conn = await asyncpg.connect(**params)
+
+    sql = dedent("""\
+        SELECT type_id FROM contact_types ORDER BY type_id
+    """)
+    contact_types = await conn.fetch(sql)
+
+    sql = dedent("""\
+        INSERT INTO contacts (
+            first_name, last_name, type_id, phone_number, email
+        ) VALUES (
+            ($1), ($2), ($3), ($4), ($5)
+        )
+    """)
+    for _ in range(num_contacts):
+        contact_data = make_contact(faker, contact_types)
+        await conn.execute(sql, *contact_data)
+        print('.')
 
 
 def command_makedata(opts):
+    # we will support an alternative environment file later on
     asyncio.run(make_data(opts.seed, opts.contacts))
-    print('Not yet implemented', file=sys.stderr)
     return 1
 
 
@@ -67,6 +101,8 @@ def create_parser(prog_name):
 
     scmd = sp.add_parser('makedata', help='Make sample data')
     scmd.set_defaults(func=command_makedata)
+    scmd.add_argument('--env', metavar='PATH', default=None,
+                      help='Path to environment file')
     scmd.add_argument('--contacts', metavar='COUNT',
                       type=positive_int_type, default=100,
                       help='How many contacts to make')

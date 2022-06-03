@@ -7,6 +7,8 @@ from argparse import ArgumentParser, ArgumentTypeError
 import uvicorn
 from faker import Faker
 
+from backend.config import get_settings
+
 
 def positive_int_type(rawvalue):
     if rawvalue is None:

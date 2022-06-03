@@ -12,6 +12,10 @@ settings = get_settings()
 app = FastAPI()
 
 
+@lru_cache
+async def connect_db(database_url : )
+
+
 @app.on_event('startup')
 async def startup():
     app.state.pool = settings.database_url

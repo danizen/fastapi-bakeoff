@@ -39,19 +39,21 @@ def command_migrate(opts):
     return 1
 
 
-def make_contact(faker, contact_types):
-    first_name = faker.first_name()
-    last_name = faker.last_name()
-    type_id = faker.random.choice(contact_types)
-    if faker.random.random() < 0.4:
-        phone_number = faker.phone_number()
-    else:
-        phone_number = None
-    if faker.random.random() < 0.7:
-        email = faker.email()
-    else:
-        email = None
-    return [first_name, last_name, type_id, phone_number, email]
+async def make_contacts(faker, contact_types, num_contacts=10):
+    for _ in range(num_contacts):
+        first_name = faker.first_name()
+        last_name = faker.last_name()
+        type_id = faker.random.choice(contact_types)
+        if faker.random.random() < 0.4:
+            phone_number = faker.phone_number()
+        else:
+            phone_number = None
+        if faker.random.random() < 0.7:
+            email = faker.email()
+        else:
+            email = None
+        yield (first_name, last_name, type_id, phone_number, email)
+        print('.')
 
 
 async def make_data(seed=0, num_contacts=10):
@@ -65,23 +67,23 @@ async def make_data(seed=0, num_contacts=10):
     """)
     contact_types = await conn.fetch(sql)
 
-    sql = dedent("""\
-        INSERT INTO contacts (
-            first_name, last_name, type_id, phone_number, email
-        ) VALUES (
-            ($1), ($2), ($3), ($4), ($5)
-        )
-    """)
-    for _ in range(num_contacts):
-        contact_data = make_contact(faker, contact_types)
-        await conn.execute(sql, *contact_data)
-        print('.')
+    await conn.copy_records_to_table(
+        'contacts',
+        records=make_contacts(faker, contact_types, num_contacts),
+        columns=[
+            'first_name',
+            'last_name',
+            'type_id',
+            'phone_number',
+            'email'
+        ]
+    )
 
 
 def command_makedata(opts):
     # we will support an alternative environment file later on
     asyncio.run(make_data(opts.seed, opts.contacts))
-    return 1
+    return 0
 
 
 def create_parser(prog_name):

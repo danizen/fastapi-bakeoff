@@ -7,6 +7,7 @@ from textwrap import dedent
 import asyncpg
 import uvicorn
 from faker import Faker
+from progress.bar import Bar
 
 from backend.config import get_settings
 
@@ -40,6 +41,7 @@ def command_migrate(opts):
 
 
 async def make_contacts(faker, contact_types, num_contacts=10):
+    bar = Bar(max=num_contacts)
     for _ in range(num_contacts):
         first_name = faker.first_name()
         last_name = faker.last_name()
@@ -53,7 +55,8 @@ async def make_contacts(faker, contact_types, num_contacts=10):
         else:
             email = None
         yield (first_name, last_name, type_id, phone_number, email)
-        print('.')
+        bar.next()
+    bar.finish()
 
 
 async def make_data(seed=0, num_contacts=10):
@@ -65,7 +68,8 @@ async def make_data(seed=0, num_contacts=10):
     sql = dedent("""\
         SELECT type_id FROM contact_types ORDER BY type_id
     """)
-    contact_types = await conn.fetch(sql)
+    records = await conn.fetch(sql)
+    contact_types = [record['type_id'] for record in records]
 
     await conn.copy_records_to_table(
         'contacts',

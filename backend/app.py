@@ -1,24 +1,26 @@
-from typing import List
+from typing import List, Optional
 
-from pydantic import PositiveInt
-from fastapi import FastAPI, Depends
+import asyncpg
+from pydantic import NonNegativeInt, conint
+from fastapi import FastAPI
 
-from .schema import Version, Contact
+from .schema import Version, Contact, ContactType
 from .database import ContactsService
-from .config import Settings, get_settings
+from .config import get_settings
 
 
 settings = get_settings()
 app = FastAPI()
 
 
-@lru_cache
-async def connect_db(database_url : )
-
-
 @app.on_event('startup')
 async def startup():
-    app.state.pool = settings.database_url
+    params = settings.connect_params()
+    app.state.pool = await asyncpg.create_pool(
+        min_size=settings.pool_min_size,
+        max_size=settings.pool_max_size,
+        **params
+    )
 
 
 @app.get('/version', response_model=Version)
@@ -26,18 +28,28 @@ def get_version():
     return Version(version='0.0.1')
 
 
-@app.get('/fibonacci/<number>/', response_model=PositiveInt)
-def get_fibonacci(number: PositiveInt):
+@app.get('/fibonacci/<number>/', response_model=conint(gt=0))
+async def get_fibonacci(number: conint(ge=0)):
     return 2
 
 
+@app.get('/types/', response_model=List[ContactType])
+async def list_types():
+    async with app.state.pool.acquire() as conn:
+        dao = ContactsService(conn)
+        return await dao.list_types()
+
+
 @app.get('/contacts/', response_model=List[Contact])
-def list_contacts(dao=Depends(ContactsService)):
-    import pdb
-    pdb.set_trace()
-    return dao.list_contacts()
+async def list_contacts(limit: Optional[conint(gt=0, le=200)],
+                        offset: Optional[conint(ge=0)]):
+    async with app.state.pool.acquire() as conn:
+        dao = ContactsService(conn)
+        return await dao.list_contacts(limit, offset)
 
 
 @app.get('/contacts/<contact_id>/', response_model=Contact)
-def retrieve_contact(contact_id: PositiveInt, dao=Depends(ContactsService)):
-    return dao.get_contact(contact_id)
+async def retrieve_contact(contact_id: NonNegativeInt):
+    async with app.state.pool.acquire() as conn:
+        dao = ContactsService(conn)
+        return await dao.get_contact(contact_id)

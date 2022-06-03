@@ -1,36 +1,72 @@
-from faker import Faker
+from textwrap import dedent
+
+import asyncpg
+from pydantic import NonNegativeInt, conint
+
 from .schema import Contact, ContactType
 
 
 class ContactsService:
-    def __init__(self, pool):
-        self.pool = pool
-        self.contact_types = [
-            ContactType(type_id=1, type_name='Friends'),
-            ContactType(type_id=2, type_name='Relatives'),
-            ContactType(type_id=3, type_name='Coworkers')
-        ]
-        faker = Faker(0)
-        num_contacts = faker.random.randint(10, 100)
-        contacts = []
-        for contact_id in range(1, num_contacts+1):
-            first_name = faker.first_name()
-            last_name = faker.last_name()
-            contact_type = faker.random.choice(self.contact_types)
-            contact = Contact(
-                contact_id=contact_id,
-                first_name=first_name,
-                last_name=last_name,
-                contact_type=contact_type
-            )
-            contacts.append(contact)
-        self.contacts = contacts
+    def __init__(self, connection: asyncpg.Connection):
+        self.conn = connection
 
-    def list_contacts(self):
-        return self.contacts
+    @staticmethod
+    def marshall(record: asyncpg.Record):
+        contact_type = ContactType(
+            type_id=record['type_id'],
+            type_name=record['type_name']
+        )
+        contact = Contact(
+            contact_id=record['contact_id'],
+            first_name=record['first_name'],
+            last_name=record['last_name'],
+            contact_type=contact_type,
+            phone_number=record['phone_number'],
+            email=record['email']
+        )
+        return contact
 
-    def get_contact(self, contact_id: int):
-        for contact in self.contacts:
-            if contact.contact_id == contact_id:
-                return contact
-        return None
+    async def list_types(self):
+        sql = dedent("""\
+            SELECT type_id, type_name FROM contact_types ORDER BY type_id
+        """)
+        records = await self.conn.fetch(sql)
+        return [ContactType(type_id=r[0], type_name=r[1]) for r in records]
+
+    async def list_contacts(self,
+                            limit: conint(gt=0, lt=200) = 100,
+                            offset: conint(ge=0) = 0):
+        sql = dedent("""\
+          SELECT
+                c.contact_id,
+                c.first_name,
+                c.last_name,
+                ct.type_id,
+                ct.type_name,
+                c.phone_number,
+                c.email
+            FROM contacts c
+            JOIN contact_types ct ON (c.type_id = ct.type_id)
+            LIMIT $1 OFFSET $2
+        """)
+        records = await self.conn.fetch(sql, limit, offset)
+        return [self.marshall(record) for record in records]
+
+    async def get_contact(self,
+                          contact_id: NonNegativeInt):
+        # Because of the join, there's a bit of marshalling here
+        sql = dedent("""\
+            SELECT
+                c.contact_id,
+                c.first_name,
+                c.last_name,
+                ct.type_id,
+                ct.type_name,
+                c.phone_number,
+                c.email
+            FROM contacts c
+            JOIN contact_types ct ON (c.type_id = ct.type_id)
+            WHERE c.contact_id = $1
+        """)
+        record = await self.conn.fetchrow(sql, contact_id)
+        return self.marshall(record)

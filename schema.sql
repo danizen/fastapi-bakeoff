@@ -10,9 +10,9 @@ VALUES ('Relatives'), ('Friends'), ('Colleagues');
 
 CREATE TABLE contacts (
 	contact_id SERIAL PRIMARY KEY,
-	first_name VARCHAR(50) NOT NULL,
-	last_name VARCHAR(50) NOT NULL,
+	first_name VARCHAR(100) NOT NULL,
+	last_name VARCHAR(100) NOT NULL,
 	type_id INT NOT NULL REFERENCES contact_types (type_id),
-	phone_number VARCHAR(20),
+	phone_number VARCHAR(30),
 	email VARCHAR(256)
 );

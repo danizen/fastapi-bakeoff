@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel, PositiveInt
+from pydantic import BaseModel, NonNegativeInt
 
 
 class Version(BaseModel):
@@ -7,12 +7,12 @@ class Version(BaseModel):
 
 
 class ContactType(BaseModel):
-    type_id: PositiveInt
+    type_id: NonNegativeInt
     type_name: str
 
 
 class Contact(BaseModel):
-    contact_id: Optional[PositiveInt]
+    contact_id: NonNegativeInt
     first_name: str
     last_name: str
     contact_type: ContactType

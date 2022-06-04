@@ -81,9 +81,9 @@
 
     <target name="package" depends="pip"
             description="--> Construct a Zip file for deployment to Amazon S3">
-        <mkdir dir="${basedir}/dist" />
-        <copy todir="${basedir}/dist">
-            <fileset dir="${basedir}/src">
+        <mkdir dir="${basedir}/dist/backend" />
+        <copy todir="${basedir}/dist/backend">
+            <fileset dir="${basedir}/backend">
                 <!-- We explicitly don't want the tool or templates -->
                 <include name="**/*.py"/>
                 <exclude name="__pycache__/**"/>

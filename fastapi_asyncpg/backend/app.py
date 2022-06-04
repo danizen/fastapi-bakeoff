@@ -60,10 +60,23 @@ async def list_types():
         return await dao.list_types()
 
 
-@app.get('/contacts/', response_model=List[Contact])
-async def list_contacts(limit: Optional[conint(gt=0, le=200)],
-                        offset: Optional[conint(ge=0)],
-                        starts: Optional[str]):
+@app.get('/contacts/fetch', response_model=List[Contact])
+async def fetch_contacts(limit: Optional[conint(gt=0, le=200)],
+                         offset: Optional[conint(ge=0)],
+                         starts: Optional[str]):
+    if offset is None:
+        offset = 0
+    if limit is None:
+        limit = 100
+    async with app.state.pool.acquire() as conn:
+        dao = ContactsService(conn)
+        return await dao.fetch_contacts(limit, offset, starts)
+
+
+@app.get('/contacts/for', response_model=List[Contact])
+async def fetch_contacts(limit: Optional[conint(gt=0, le=200)],
+                         offset: Optional[conint(ge=0)],
+                         starts: Optional[str]):
     if offset is None:
         offset = 0
     if limit is None:

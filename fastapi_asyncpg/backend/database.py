@@ -56,6 +56,34 @@ class ContactsService:
             JOIN contact_types ct ON (c.type_id = ct.type_id)
             {where_clause} LIMIT $1 OFFSET $2
         """)
+        async with self.conn.tranasction():
+            results = []
+            async for record in self.conn.cursor(sql, *params):
+                results.append(self.marshall(record))
+            return results
+
+    async def fetch_contacts(self,
+                             limit: conint(gt=0, lt=200) = 100,
+                             offset: conint(ge=0) = 0,
+                             starts: Optional[str] = None):
+        where_clause = ''
+        params = [limit, offset]
+        if starts:
+            params.append(starts.lower() + '%')
+            where_clause = "WHERE lower(c.last_name) LIKE $3"
+        sql = dedent(f"""\
+            SELECT
+                c.contact_id,
+                c.first_name,
+                c.last_name,
+                ct.type_id,
+                ct.type_name,
+                c.phone_number,
+                c.email
+            FROM contacts c
+            JOIN contact_types ct ON (c.type_id = ct.type_id)
+            {where_clause} LIMIT $1 OFFSET $2
+        """)
         records = await self.conn.fetch(sql, *params)
         return [self.marshall(record) for record in records]
 

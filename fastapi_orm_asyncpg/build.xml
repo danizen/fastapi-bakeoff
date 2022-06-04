@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="fastapi-lambda" default="package">
+
+    <property name="target.file" value="fastapi-lambda.zip"/>
+    <property name="include.deps" value="true"/>
+    <property name="deps.file" value="requirements.txt"/>
+    <property name="bucket.name" value="nlm-sbox-ab-django-app-djangotest-artifacts-us-east-1"/>
+    <property name="bucket.prefix" value="lambdas/"/>
+    <property name="bucket.path" value="s3://${bucket.name}/${bucket.prefix}${target.file}"/>
+
+    <macrodef name="awscli">
+        <attribute name="failonerror" default="true"/>
+        <attribute name="dir" default="${basedir}"/>
+        <element name="awscli-args" implicit="true"/>
+        <sequential>
+            <exec dir="@{dir}" failonerror="@{failonerror}" executable="aws">
+                <awscli-args />
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <!-- DevOps and developers can override the properties here -->
+    <property file="build.properties"/>
+
+    <target name="clean"
+        description="--> Remove artifacts of bulid and test">
+        <delete includeemptydirs="true">
+            <fileset dir="${basedir}">
+                <include name="**/*.pyo"/>
+                <include name="**/*.pyc"/>
+                <include name="**/__pycache__"/>
+                <include name="${target.file}"/>
+                <include name="junit.xml"/>
+                <include name="coverage.xml"/>
+                <include name=".coverage"/>
+                <include name="dist/**"/>
+                <include name=".pytest_cache/**"/>
+            </fileset>
+        </delete>
+    </target>
+
+    <target name="cfn-lint">
+        <exec dir="${basedir}" failonerror="true" executable="cfn-lint">
+            <arg value="cf/**/*.yaml" />
+        </exec>
+        <!-- Do something (aws validate) for each template in the path -->
+        <!-- <fileset dir="${basedir}/templates">
+            <include name="**/*.yaml"/>
+        </fileset> -->
+    </target>
+
+    <target name="flake8">
+        <exec executable="flake8" dir="${basedir}" failonerror="true"/>
+    </target>
+
+    <target name="lint" depends="cfn-lint, flake8"
+            description="--> Lint both Python and CloudFormation"/>
+
+    <target name="test"
+            description="--> Test the Python module using pytest">
+        <exec executable="pytest" dir="${basedir}" failonerror="true"/>
+    </target>
+
+    <target name="pip" if="${include.deps}">
+        <mkdir dir="${basedir}/dist" />
+        <exec executable="python" dir="${basedir}" failonerror="true">
+            <arg value="-mpip" />
+            <arg value="install" />
+            <!--
+                The dist directory will hold packages for Lambda
+            -->
+            <arg value="-t" />
+            <arg value="dist" />
+            <!--
+                These are our dependencies
+            -->
+            <arg value="-r" />
+            <arg value="${deps.file}" />
+        </exec>
+    </target>
+
+    <target name="package" depends="pip"
+            description="--> Construct a Zip file for deployment to Amazon S3">
+        <mkdir dir="${basedir}/dist/backend" />
+        <copy todir="${basedir}/dist/backend">
+            <fileset dir="${basedir}/backend">
+                <!-- We explicitly don't want the tool or templates -->
+                <include name="**/*.py"/>
+                <exclude name="__pycache__/**"/>
+            </fileset>
+        </copy>
+        <zip destfile="${basedir}/${target.file}">
+            <fileset dir="${basedir}/dist">
+                <exclude name="**/__pycache__/**"/>
+            </fileset>
+        </zip>
+    </target>
+
+    <!--
+        Not ready yet for "lint" target
+    -->
+    <target name="build" depends="clean, test, package"
+            description="--> Test and Construct a Zip file for deployment to Amazon S3"/>
+
+    <!--
+        Note - using -c "from awscli.clidriver import main; main()"
+        is needed because awscli doesn't install aws as a console script.
+    -->
+    <target name="upload"
+            description="--> Upload the S3 file to Amazon S3">        
+        <awscli>
+            <arg value="s3" />
+            <arg value="cp" />
+            <arg value="${target.file}" />
+            <arg value="${bucket.path}" />
+        </awscli>
+    </target>
+
+</project>

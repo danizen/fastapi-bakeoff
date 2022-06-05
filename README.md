@@ -51,3 +51,16 @@ This however leads to a productivity issue for the working engineer, in that a l
 
 API calls which serve data from an RDBMS will be nearly as fast in async python as in golang. asyncpg will be faster than aiopg, but not dramatically. API calls which do significant computation will be much faster in golang.
 
+### What about PyPy
+
+PyPy is much, much faster than CPython. asyncpg is a Cython 
+module, and may be slower in PyPy. aiopg should be faster,
+but relies on psycopg-binary.  Probably a good idea to try
+to run the fastapi_aiopg on PyPy as a test. 
+
+Some questions about PyPy:
+- How do I convince my DevOps to install PyPy?
+- How do I convince DSS to install PyPy?
+- How do I manage the availability of packages for 
+  a particular developer?
+- How do I deploy into AWS Lambda - using Docker?

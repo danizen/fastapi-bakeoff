@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List
 from pydantic import BaseModel, NonNegativeInt
 
 
@@ -16,5 +16,5 @@ class Contact(BaseModel):
     first_name: str
     last_name: str
     contact_type: ContactType
-    phone_number: Optional[str]
-    email: Optional[str]
+    phone_number: List[str]
+    email: List[str]

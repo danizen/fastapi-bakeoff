@@ -1,3 +1,5 @@
+import asyncio
+from collections import defaultdict
 from textwrap import dedent
 from typing import Optional
 
@@ -12,7 +14,7 @@ class ContactsService:
         self.conn = connection
 
     @staticmethod
-    def marshall(record: asyncpg.Record):
+    def marshall(record: asyncpg.Record, phones: dict, emails: dict):
         contact_type = ContactType(
             type_id=record['type_id'],
             type_name=record['type_name']
@@ -22,8 +24,8 @@ class ContactsService:
             first_name=record['first_name'],
             last_name=record['last_name'],
             contact_type=contact_type,
-            phone_number=record['phone_number'],
-            email=record['email']
+            phone_number=phones.get(record['contact_id']),
+            email=emails.get(record['contact_id'])
         )
         return contact
 
@@ -77,15 +79,38 @@ class ContactsService:
                 c.first_name,
                 c.last_name,
                 ct.type_id,
-                ct.type_name,
-                c.phone_number,
-                c.email
+                ct.type_name
             FROM contacts c
             JOIN contact_types ct ON (c.type_id = ct.type_id)
             {where_clause} LIMIT $1 OFFSET $2
         """)
         records = await self.conn.fetch(sql, *params)
-        return [self.marshall(record) for record in records]
+        in_clause = ', '.join(str(r['contact_id']) for r in records)
+
+        sql = dedent(f"""\
+            SELECT contact_id, phone_number
+            FROM contact_phones
+            WHERE contact_id = ANY(ARRAY[{in_clause}])
+        """)
+        phone_recs = await self.conn.fetch(sql)
+        phones = defaultdict(list)
+        for contact_id, phone_number in phone_recs:
+            phones[contact_id].append(phone_number)
+
+        sql = dedent(f"""\
+            SELECT contact_id, email_address
+            FROM contact_emails
+            WHERE contact_id = ANY(ARRAY[{in_clause}])
+        """)
+        email_recs = await self.conn.fetch(sql)
+        emails = defaultdict(list)
+        for contact_id, email_address in email_recs:
+            emails[contact_id].append(email_address)
+
+        return [
+            self.marshall(record, phones, emails) 
+            for record in records
+        ]
 
     async def get_contact(self,
                           contact_id: NonNegativeInt):
@@ -96,12 +121,28 @@ class ContactsService:
                 c.first_name,
                 c.last_name,
                 ct.type_id,
-                ct.type_name,
-                c.phone_number,
-                c.email
+                ct.type_name
             FROM contacts c
             JOIN contact_types ct ON (c.type_id = ct.type_id)
             WHERE c.contact_id = $1
         """)
-        record = await self.conn.fetchrow(sql, contact_id)
-        return self.marshall(record)
+
+        phone_sql = dedent("""\
+            SELECT phone_number
+            FROM contact_phones
+            WHERE contact_id = $1
+        """)
+
+        email_sql = dedent("""\
+            SELECT email_address
+            FROM contact_emails
+            WHERE contact_id = $1
+        """)
+
+        results = await asyncio.gather([
+            self.conf.fetchrows(sql, contact_id),
+            self.conf.fetchrows(phone_sql, contact_id),
+            self.conn.fetchrows(email_sql, contact_id)
+        ])
+        contact = self.marshall(record)
+        contact.emails = []

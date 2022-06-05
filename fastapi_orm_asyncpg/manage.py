@@ -2,16 +2,26 @@
 import asyncio
 import sys
 from argparse import ArgumentParser, ArgumentTypeError
-from textwrap import dedent
 
 import uvicorn
-from sqlalchemy import create_mock_engine, create_engine
+from sqlalchemy import (
+    create_mock_engine,
+    create_engine,
+    insert,
+    select
+)
 from faker import Faker
 from progress.bar import Bar
 
 from backend.config import get_settings
 from backend.database import create_async_engine
-from backend.orm import Base
+from backend.orm import (
+    Base,
+    ContactType,
+    Contact,
+    ContactPhone,
+    ContactEmail
+)
 
 
 def positive_int_type(rawvalue):
@@ -50,50 +60,63 @@ def command_migrate(opts):
     dsn = str(settings.database_url)
     engine = create_engine(dsn)
     Base.metadata.create_all(engine)
-
-
-async def make_contacts(faker, contact_types, num_contacts=10):
-    bar = Bar(max=num_contacts)
-    for _ in range(num_contacts):
-        first_name = faker.first_name()
-        last_name = faker.last_name()
-        type_id = faker.random.choice(contact_types)
-        if faker.random.random() < 0.4:
-            phone_number = faker.phone_number()
-        else:
-            phone_number = None
-        if faker.random.random() < 0.7:
-            email = faker.email()
-        else:
-            email = None
-        yield (first_name, last_name, type_id, phone_number, email)
-        bar.next()
-    bar.finish()
+    with engine.connect() as conn:
+        for name in ['Friends', 'Relatives', 'Coworkers']:
+            conn.execute(
+                insert(ContactType).values(type_name=name)
+            )
+        conn.commit()
 
 
 async def make_data(seed=0, num_contacts=10):
     settings = get_settings()
     engine = create_async_engine(settings)
     faker = Faker(seed)
-    conn = await engine.connect()
+    bar = Bar(max=num_contacts)
 
-    sql = dedent("""\
-        SELECT type_id FROM contact_types ORDER BY type_id
-    """)
-    records = await conn.fetch(sql)
-    contact_types = [record['type_id'] for record in records]
+    # get the contact_types
+    async with engine.connect() as conn:
+        result = await conn.execute(
+            select(ContactType.type_id)
+        )
+        contact_types = [row[0] for row in result.all()]
 
-    await conn.copy_records_to_table(
-        'contacts',
-        records=make_contacts(faker, contact_types, num_contacts),
-        columns=[
-            'first_name',
-            'last_name',
-            'type_id',
-            'phone_number',
-            'email'
-        ]
-    )
+    for _ in range(num_contacts):
+        async with engine.connect() as conn:
+            # make contact
+            stmt = insert(Contact).values(
+                first_name=faker.first_name(),
+                last_name=faker.last_name(),
+                type_id=faker.random.choice(contact_types)
+            )
+            result = await conn.execute(stmt)
+            contact_id = result.inserted_primary_key[0]
+
+            # make phone numbers
+            chance = 0.4
+            while faker.random.random() < chance:
+                stmt = insert(ContactPhone).values(
+                    phone_number=faker.phone_number(),
+                    contact_id=contact_id
+                )
+                await conn.execute(stmt)
+                chance = 0.2
+
+            # make emails
+            chance = 0.7
+            if faker.random.random() < chance:
+                stmt = insert(ContactEmail).values(
+                    email_address=faker.email(),
+                    contact_id=contact_id
+                )
+                await conn.execute(stmt)
+                chance = 0.3
+
+            # commit this contact
+            await conn.commit()
+        bar.next()
+    bar.finish()
+    await engine.dispose()
 
 
 def command_makedata(opts):

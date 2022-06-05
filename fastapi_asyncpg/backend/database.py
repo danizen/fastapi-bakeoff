@@ -56,7 +56,7 @@ class ContactsService:
             JOIN contact_types ct ON (c.type_id = ct.type_id)
             {where_clause} LIMIT $1 OFFSET $2
         """)
-        async with self.conn.tranasction():
+        async with self.conn.transaction():
             results = []
             async for record in self.conn.cursor(sql, *params):
                 results.append(self.marshall(record))

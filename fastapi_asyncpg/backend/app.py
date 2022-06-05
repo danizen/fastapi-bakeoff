@@ -61,9 +61,9 @@ async def list_types():
 
 
 @app.get('/contacts/fetch', response_model=List[Contact])
-async def fetch_contacts(limit: Optional[conint(gt=0, le=200)],
-                         offset: Optional[conint(ge=0)],
-                         starts: Optional[str]):
+async def fetch_contacts(limit: conint(gt=0, le=200) = 100,
+                         offset: conint(ge=0) = 0,
+                         starts: Optional[str] = None):
     if offset is None:
         offset = 0
     if limit is None:
@@ -74,9 +74,9 @@ async def fetch_contacts(limit: Optional[conint(gt=0, le=200)],
 
 
 @app.get('/contacts/for', response_model=List[Contact])
-async def fetch_contacts(limit: Optional[conint(gt=0, le=200)],
-                         offset: Optional[conint(ge=0)],
-                         starts: Optional[str]):
+async def list_contacts(limit: conint(gt=0, le=200) = 100,
+                        offset: conint(ge=0) = 0,
+                        starts: Optional[str] = None):
     if offset is None:
         offset = 0
     if limit is None:

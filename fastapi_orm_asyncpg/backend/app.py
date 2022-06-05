@@ -5,9 +5,10 @@ from starlette.responses import RedirectResponse
 from starlette.status import HTTP_302_FOUND
 from fastapi import FastAPI
 
-from .schema import Version, Contact, ContactType
-from .database import create_engine, ContactsService
 from .config import get_settings
+from .contacts import ContactsService
+from .orm import create_async_engine, create_session_maker
+from .schema import Version, Contact, ContactType
 
 
 settings = get_settings()
@@ -16,7 +17,8 @@ app = FastAPI()
 
 @app.on_event('startup')
 def startup():
-    app.state.engine = create_engine(settings)
+    app.state.engine = engine = create_async_engine(settings)
+    app.state.sessionmaker = create_session_maker(engine)
 
 
 @app.on_event('shutdown')
@@ -54,8 +56,8 @@ async def get_fibonacci(number: conint(ge=0)):
 
 @app.get('/types/', response_model=List[ContactType])
 async def list_types():
-    async with app.state.pool.acquire() as conn:
-        dao = ContactsService(conn)
+    async with app.state.sessionmaker() as session:
+        dao = ContactsService(session)
         return await dao.list_types()
 
 
@@ -67,9 +69,9 @@ async def fetch_contacts(limit: conint(gt=0, le=200) = 100,
         offset = 0
     if limit is None:
         limit = 100
-    async with app.state.pool.acquire() as conn:
-        dao = ContactsService(conn)
-        return await dao.fetch_contacts(limit, offset, starts)
+    async with app.state.sessionmaker() as session:
+        dao = ContactsService(session)
+        return await dao.list_contacts(limit, offset, starts)
 
 
 @app.get('/contacts/for', response_model=List[Contact])
@@ -80,13 +82,13 @@ async def list_contacts(limit: conint(gt=0, le=200) = 100,
         offset = 0
     if limit is None:
         limit = 100
-    async with app.state.pool.acquire() as conn:
-        dao = ContactsService(conn)
+    async with app.state.sessionmaker() as session:
+        dao = ContactsService(session)
         return await dao.list_contacts(limit, offset, starts)
 
 
 @app.get('/contacts/<contact_id>/', response_model=Contact)
 async def retrieve_contact(contact_id: NonNegativeInt):
-    async with app.state.pool.acquire() as conn:
-        dao = ContactsService(conn)
+    async with app.state.sessionmaker() as session:
+        dao = ContactsService(session)
         return await dao.get_contact(contact_id)

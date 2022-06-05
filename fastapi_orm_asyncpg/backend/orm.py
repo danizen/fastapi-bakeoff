@@ -6,10 +6,15 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import (
     declarative_base,
-    relationship
+    relationship,
+    sessionmaker
 )
 
-from sqlalchemy.ext import asyncio as sqlalchemy_async
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    create_async_engine as base_create_async_engine
+)
 
 from .config import Settings
 
@@ -23,11 +28,19 @@ def create_async_engine(settings: Settings):
         port=settings.db_port,
         name=settings.db_name
     )
-    return sqlalchemy_async.create_async_engine(
+    return base_create_async_engine(
         dsn,
         echo=settings.echo_sql,
         # pool_size=settings.pool_min_size,
         # max_overflow=settings.pool_max_size - settings.pool_min_size
+    )
+
+
+def create_session_maker(engine: AsyncEngine):
+    return sessionmaker(
+        engine,
+        expire_on_commit=False,
+        class_=AsyncSession
     )
 
 

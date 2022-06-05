@@ -4,12 +4,14 @@ import sys
 from argparse import ArgumentParser, ArgumentTypeError
 from textwrap import dedent
 
-import asyncpg
 import uvicorn
+from sqlalchemy import create_mock_engine, create_engine
 from faker import Faker
 from progress.bar import Bar
 
 from backend.config import get_settings
+from backend.database import create_async_engine
+from backend.orm import Base
 
 
 def positive_int_type(rawvalue):
@@ -35,9 +37,19 @@ def command_runserver(opts):
     uvicorn.run('backend.app:app', host=host, port=port)
 
 
+def command_sqlmigrate(opts):
+    engine = create_mock_engine(
+        'postgresql://localhost/mock',
+        executor=lambda sql: print(sql.compile(dialect=engine.dialect))
+    )
+    Base.metadata.create_all(engine)
+
+
 def command_migrate(opts):
-    print('Not yet implemented', file=sys.stderr)
-    return 1
+    settings = get_settings()
+    dsn = str(settings.database_url)
+    engine = create_engine(dsn)
+    Base.metadata.create_all(engine)
 
 
 async def make_contacts(faker, contact_types, num_contacts=10):
@@ -61,9 +73,9 @@ async def make_contacts(faker, contact_types, num_contacts=10):
 
 async def make_data(seed=0, num_contacts=10):
     settings = get_settings()
-    params = settings.connect_params()
+    engine = create_async_engine(settings)
     faker = Faker(seed)
-    conn = await asyncpg.connect(**params)
+    conn = await engine.connect()
 
     sql = dedent("""\
         SELECT type_id FROM contact_types ORDER BY type_id
@@ -101,6 +113,9 @@ def create_parser(prog_name):
     scmd = sp.add_parser('runserver', help='Run webapp')
     scmd.set_defaults(func=command_runserver)
     scmd.add_argument('host', default='127.0.0.1:8000')
+
+    scmd = sp.add_parser('sqlmigrate', help='Print SQL DDL via SQL Alchemy')
+    scmd.set_defaults(func=command_sqlmigrate)
 
     scmd = sp.add_parser('migrate', help='Custom management command')
     scmd.set_defaults(func=command_migrate)

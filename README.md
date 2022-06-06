@@ -2,7 +2,13 @@
 
 ## Summary
 
-Web applications are evolving away from serving templated HTML and towards being split into an API backend and a static HTML or JavaScript frontend. This repository studies the trade-offs between multiple python webapp architectures for the modern API backend.
+Web applications are evolving away from serving templated HTML and towards being split into an API backend and a static HTML or JavaScript frontend. This repository studies the trade-offs between multiple python webapp architectures for the modern API backend. In trying fastapi, I am attempting to address three problems with Django WSGI:
+
+* Because of the GIL, multi-threading is just a way to avoid blocking and achieve concurrency, and so operating systems threads do not lead to true parallelism.  Thus asyncio and coroutines, but using multiple process workers also happens in these architectures.
+* Without asyncio, the problems of managing database connections are made worse because we parallelize though multiple processes – the drivers are not built so that multiple processes can share database connections, and so pursuing parallelism through multiple processes introduces issues with connection pooling.  I think AWS RDS Proxy (or pgbouncer) are good solutions here, but would like to improve things on the application side. There is no good solution at work for Oracle, but Oracle DRCP is designed for this.
+* The Django ORM is great for developers who don’t want to think about the database and don’t know SQL, but every ORM is a “leaky abstraction”.  The best ORMs are aware of this, and strive to write very much like SQL to enable transfer learning. Django's ORM doesn’t fall into this camp.
+
+Another nice to have which seems less essential to me is to have API schema generation and validation baked into the architecture. This is why fastapi is the async framework I am trying here. I know how to do this as well with Django, and so will not reproduce the steps in this repository, at least not initially.  All of these will seek to following the tenets of the twelve factor app.
 
 ## Implementations
 
@@ -11,12 +17,11 @@ Each of the sub-directories implements one combination of layers. Two of these i
 - django - combines djangorestframework, Django, and psycopg-binary.
 - golang_bun - this combines golang and bun, a go-native PostgreSQL driver.
 
-The following implementations are test cases:
+The following implementations will be or are test cases:
 
 - fastapi_asyncpg - Combines fastapi, starlette, pydantic, and asyncpg.
-- fastapi_orm_asyncpg - Combines fastapi, starlette, pydantic, sqlalchemy, and asyncpg
+- fastapi_orm_asyncpg - Combines fastapi, starlette, pydantic, sqlalchemy ORM, and asyncpg
 - fastapi_aiopg - Combines fastapi, starlette, pydantic, aiopg, and psycopg-binary.
-
 
 ## API
 

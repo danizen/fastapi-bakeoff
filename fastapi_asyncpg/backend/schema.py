@@ -1,9 +1,13 @@
 from typing import List, Optional
-from pydantic import BaseModel, NonNegativeInt
+from pydantic import BaseModel, NonNegativeInt, conint
 
 
 class Version(BaseModel):
     version: str
+
+
+class FibonacciResponse(BaseModel):
+    result: conint(gt=0)
 
 
 class ContactType(BaseModel):

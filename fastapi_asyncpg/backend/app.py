@@ -8,6 +8,7 @@ from fastapi import FastAPI, HTTPException
 
 from .schema import (
     Version,
+    FibonacciResponse,
     Contact,
     ContactTypesResponse,
     ContactsResponse
@@ -57,9 +58,9 @@ def fib(n: int) -> int:
         return fib(n-1) + fib(n-2)
 
 
-@app.get('/fibonacci/{number}/', response_model=conint(gt=0))
+@app.get('/fibonacci/{number}/', response_model=FibonacciResponse)
 def get_fibonacci(number: conint(ge=0, lt=35)):
-    return fib(number)
+    return FibonacciResponse(result=fib(number))
 
 
 @app.get('/types/', response_model=ContactTypesResponse)

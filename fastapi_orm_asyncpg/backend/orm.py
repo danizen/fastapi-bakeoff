@@ -57,6 +57,11 @@ class ContactType(Base):
 class Contact(Base):
     __tablename__ = 'contacts'
 
+    # needed because of async - this means it will load
+    # all relationships, causing all the problems you
+    # expect from an ORM.
+    __mapper_args__ = {"eager_defaults": True}
+
     contact_id = Column(Integer, primary_key=True)
     first_name = Column(String(100), nullable=False)
     last_name = Column(String(100), nullable=False)

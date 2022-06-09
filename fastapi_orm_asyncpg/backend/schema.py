@@ -1,9 +1,13 @@
-from typing import Optional
-from pydantic import BaseModel, NonNegativeInt
+from typing import List, Optional
+from pydantic import BaseModel, NonNegativeInt, conint
 
 
 class Version(BaseModel):
     version: str
+
+
+class FibonacciResponse(BaseModel):
+    result: conint(gt=0)
 
 
 class ContactType(BaseModel):
@@ -19,8 +23,18 @@ class Contact(BaseModel):
     first_name: str
     last_name: str
     contact_type: ContactType
-    phone_number: Optional[str]
-    email: Optional[str]
+    phone_number: Optional[List[str]]
+    email: Optional[List[str]]
 
     class Config:
         orm_mode = True
+
+
+class ContactTypesResponse(BaseModel):
+    count: NonNegativeInt
+    results: List[ContactType]
+
+
+class ContactsResponse(BaseModel):
+    count: NonNegativeInt
+    results: List[Contact]

@@ -17,6 +17,7 @@ from django.urls import path
 
 from djapp.views import (
     VersionAPI,
+    FibonacciAPI,
     ContactTypeAPI,
     ContactListAPI,
     ContactDetailAPI,
@@ -24,6 +25,7 @@ from djapp.views import (
 
 urlpatterns = [
     path('version/', VersionAPI.as_view()),
+    path('fibonacci/<int:number>/', FibonacciAPI.as_view()),
     path('types/',  ContactTypeAPI.as_view()),
     path('contacts/', ContactListAPI.as_view()),
     path('contacts/<int:pk>/', ContactDetailAPI.as_view())

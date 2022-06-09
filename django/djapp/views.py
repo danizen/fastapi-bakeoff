@@ -21,6 +21,32 @@ class VersionAPI(APIView):
         return Response({'version': '0.0.1'})
 
 
+# This is an intentionally naively recursive
+# implementation that ignores the basics of
+# dynamic programming. We want it to slow down
+# arbitrarily through busy work.
+def fib(n: int) -> int:
+    if n < 0:
+        raise ValueError('should be non-negative')
+    elif n < 2:
+        return 1
+    else:
+        return fib(n-1) + fib(n-2)
+
+
+class FibonacciAPI(APIView):
+    def get(self, request, format=None, number=None):
+        try:
+            if not (0 <= number < 35):
+                raise ValueError('should be between 1 and 34')
+            result = fib(number)
+            return Response({'result': result})
+        except ValueError as e:
+            return Response({
+                'detail': str(e)
+            }, status=400)
+
+
 class ContactTypeAPI(ListAPIView):
     queryset = ContactType.objects.all()
     serializer_class = ContactTypeSerializer

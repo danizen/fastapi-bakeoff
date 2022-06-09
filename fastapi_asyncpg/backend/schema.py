@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, NonNegativeInt
 
 
@@ -16,5 +16,15 @@ class Contact(BaseModel):
     first_name: str
     last_name: str
     contact_type: ContactType
-    phone_number: List[str]
-    email: List[str]
+    phone_number: Optional[List[str]]
+    email: Optional[List[str]]
+
+
+class ContactTypesResponse(BaseModel):
+    count: NonNegativeInt
+    results: List[ContactType]
+
+
+class ContactsResponse(BaseModel):
+    count: NonNegativeInt
+    results: List[Contact]

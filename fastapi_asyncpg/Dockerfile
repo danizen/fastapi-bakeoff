@@ -5,6 +5,11 @@ RUN apt-get update && \
     apt-get install -y \
         --no-install-recommends build-essential gcc
 
+# utilities to help us get started
+RUN apt-get install -y \
+        --no-install-recommends \
+        net-tools bind9-dnsutils
+
 # install dependencies
 WORKDIR /usr/app
 COPY requirements.txt .

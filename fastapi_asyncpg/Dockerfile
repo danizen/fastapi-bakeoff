@@ -16,12 +16,6 @@ RUN python -m venv /usr/app/venv && \
 
 FROM python:3.10.5-slim-bullseye
 
-# utilities to help us get started
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        postgresql-client-common \
-        postgresql-client-13
-
 # create a user to run the application
 RUN groupadd -g 999 app && \
     useradd -u 999 -g app -d /usr/app app && \
@@ -32,5 +26,6 @@ WORKDIR /usr/app
 COPY --chown=app:app --from=build /usr/app/venv ./venv
 COPY --chown=app:app backend ./backend
 COPY --chown=app:app manage.py .
+EXPOSE 8000
 USER app
-CMD . venv/bin/activate && python manage.py runserver 127.0.0.1
+CMD . venv/bin/activate && python manage.py runserver 0.0.0.0

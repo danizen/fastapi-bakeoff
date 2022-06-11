@@ -6,6 +6,4 @@ ipython
 mypy			# Test typings if needed
 pytest          	# Run unit tests
 pytest-cov
-faker			# Create database data
-progress		# Show pretty progress
 psycopg-binary		# For synchronous tasks in manage.py

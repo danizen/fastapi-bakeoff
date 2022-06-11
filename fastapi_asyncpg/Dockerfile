@@ -5,11 +5,6 @@ RUN apt-get update && \
     apt-get install -y \
         --no-install-recommends build-essential gcc
 
-# utilities to help us get started
-RUN apt-get install -y \
-        --no-install-recommends \
-        net-tools bind9-dnsutils
-
 # install dependencies
 WORKDIR /usr/app
 COPY requirements.txt .
@@ -21,6 +16,12 @@ RUN python -m venv /usr/app/venv && \
 
 FROM python:3.10.5-slim-bullseye
 
+# utilities to help us get started
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        net-tools bind9-dnsutils iputils-ping \
+        postgresql-client-common
+
 # create a user to run the application
 RUN groupadd -g 999 app && \
     useradd -u 999 -g app -d /usr/app app && \
@@ -30,5 +31,5 @@ WORKDIR /usr/app
 
 COPY --chown=app:app --from=build /usr/app/venv ./venv
 COPY --chown=app:app backend ./backend
-
+USER app
 CMD . venv/bin/activate && uvicorn backend.app:app --workers 4

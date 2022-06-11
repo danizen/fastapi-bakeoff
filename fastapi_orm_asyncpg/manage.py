@@ -14,8 +14,8 @@ from faker import Faker
 from progress.bar import Bar
 
 from backend.config import get_settings
-from backend.database import create_async_engine
 from backend.orm import (
+    create_async_engine,
     Base,
     ContactType,
     Contact,
@@ -61,17 +61,19 @@ def command_migrate(opts):
     engine = create_engine(dsn)
     Base.metadata.create_all(engine)
     with engine.connect() as conn:
-        for name in ['Friends', 'Relatives', 'Coworkers']:
-            conn.execute(
-                insert(ContactType).values(type_name=name)
-            )
-        conn.commit()
+        with conn.begin() as transaction:
+            for name in ['Friends', 'Relatives', 'Coworkers']:
+                conn.execute(
+                    insert(ContactType).values(type_name=name)
+                )
+            transaction.commit()
 
 
 async def make_data(seed=0, num_contacts=10):
     settings = get_settings()
     engine = create_async_engine(settings)
-    faker = Faker(seed)
+    Faker.seed(seed)
+    faker = Faker()
     bar = Bar(max=num_contacts)
 
     # get the contact_types
@@ -81,39 +83,40 @@ async def make_data(seed=0, num_contacts=10):
         )
         contact_types = [row[0] for row in result.all()]
 
-    for _ in range(num_contacts):
-        async with engine.connect() as conn:
-            # make contact
-            stmt = insert(Contact).values(
-                first_name=faker.first_name(),
-                last_name=faker.last_name(),
-                type_id=faker.random.choice(contact_types)
-            )
-            result = await conn.execute(stmt)
-            contact_id = result.inserted_primary_key[0]
-
-            # make phone numbers
-            chance = 0.4
-            while faker.random.random() < chance:
-                stmt = insert(ContactPhone).values(
-                    phone_number=faker.phone_number(),
-                    contact_id=contact_id
+    async with engine.connect() as conn:
+        for _ in range(num_contacts):
+            async with conn.begin() as transaction:
+                # make contact
+                stmt = insert(Contact).values(
+                    first_name=faker.first_name(),
+                    last_name=faker.last_name(),
+                    type_id=faker.random.choice(contact_types)
                 )
-                await conn.execute(stmt)
-                chance = 0.2
+                result = await conn.execute(stmt)
+                contact_id = result.inserted_primary_key[0]
 
-            # make emails
-            chance = 0.7
-            if faker.random.random() < chance:
-                stmt = insert(ContactEmail).values(
-                    email_address=faker.email(),
-                    contact_id=contact_id
-                )
-                await conn.execute(stmt)
-                chance = 0.3
+                # make phone numbers
+                chance = 0.4
+                while faker.random.random() < chance:
+                    stmt = insert(ContactPhone).values(
+                        phone_number=faker.phone_number(),
+                        contact_id=contact_id
+                    )
+                    await conn.execute(stmt)
+                    chance = 0.2
 
-            # commit this contact
-            await conn.commit()
+                # make emails
+                chance = 0.7
+                if faker.random.random() < chance:
+                    stmt = insert(ContactEmail).values(
+                        email_address=faker.email(),
+                        contact_id=contact_id
+                    )
+                    await conn.execute(stmt)
+                    chance = 0.3
+
+                # commit this contact
+                await transaction.commit()
         bar.next()
     bar.finish()
     await engine.dispose()

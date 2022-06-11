@@ -62,7 +62,8 @@ async def make_contacts(faker, contact_types, num_contacts=10):
 async def make_data(seed=0, num_contacts=10):
     settings = get_settings()
     params = settings.connect_params()
-    faker = Faker(seed)
+    Faker.seed(seed)
+    faker = Faker()
     conn = await asyncpg.connect(**params)
 
     sql = dedent("""\

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import asyncio
+import os
 import sys
 from argparse import ArgumentParser, ArgumentTypeError
 from textwrap import dedent
@@ -25,6 +26,9 @@ def positive_int_type(rawvalue):
 
 
 def command_runserver(opts):
+    if 'DATABASE_URL' not in os.environ:
+        print('This container requires DATABASE_URL environment variable', file=sys.stderr)
+        raise SystemExit(1)
     host_and_port = opts.host.split(':', maxsplit=1)
     if len(host_and_port) == 2:
         host, port = host_and_port
@@ -32,7 +36,10 @@ def command_runserver(opts):
     else:
         host = host_and_port[0]
         port = 8000
-    uvicorn.run('backend.app:app', host=host, port=port)
+    if opts.reload:
+        uvicorn.run('backend.app:app', host=host, port=port, reload=True)
+    else:
+        uvicorn.run('backend.app:app', host=host, port=port, workers=5)
 
 
 def command_migrate(opts):
@@ -102,6 +109,8 @@ def create_parser(prog_name):
     scmd = sp.add_parser('runserver', help='Run webapp')
     scmd.set_defaults(func=command_runserver)
     scmd.add_argument('host', default='127.0.0.1:8000')
+    scmd.add_argument('--reload', action='store_true', default=False,
+                      help='Run uvicorn in development mode')
 
     scmd = sp.add_parser('migrate', help='Custom management command')
     scmd.set_defaults(func=command_migrate)

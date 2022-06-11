@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import asyncio
+import os
 import sys
 from argparse import ArgumentParser, ArgumentTypeError
 
@@ -44,7 +45,13 @@ def command_runserver(opts):
     else:
         host = host_and_port[0]
         port = 8000
-    uvicorn.run('backend.app:app', host=host, port=port)
+    if 'DATABASE_URL' not in os.environ:
+        print('DATABASE_URL environment variable is required', file=sys.stderr)
+        raise SystemExit(1)
+    if opts.reload:
+        uvicorn.run('backend.app:app', host=host, port=port, reload=True)
+    else:
+        uvicorn.run('backend.app:app', host=host, port=port, workers=5)
 
 
 def command_sqlmigrate(opts):
@@ -139,6 +146,8 @@ def create_parser(prog_name):
     scmd = sp.add_parser('runserver', help='Run webapp')
     scmd.set_defaults(func=command_runserver)
     scmd.add_argument('host', default='127.0.0.1:8000')
+    scmd.add_argument('--reload', action='store_true', default=False,
+                      help='Run application in development mode')
 
     scmd = sp.add_parser('sqlmigrate', help='Print SQL DDL via SQL Alchemy')
     scmd.set_defaults(func=command_sqlmigrate)

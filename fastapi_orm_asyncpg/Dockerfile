@@ -28,4 +28,4 @@ COPY --chown=app:app backend ./backend
 COPY --chown=app:app manage.py .
 EXPOSE 8000
 USER app
-CMD . venv/bin/activate && uvicorn backend.app:app --host 0.0.0.0 --workers 5
+CMD . venv/bin/activate && python manage.py runserver 0.0.0.0

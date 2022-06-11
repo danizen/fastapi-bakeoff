@@ -26,4 +26,4 @@ WORKDIR /usr/app
 COPY --chown=app:app --from=build /usr/app/venv ./venv
 COPY --chown=app:app backend ./backend
 
-CMD . venv/bin/activate && uvicorn backend.app:app
+CMD . venv/bin/activate && uvicorn backend.app:app --workers 4

@@ -4,4 +4,5 @@ uvicorn
 djangorestframework
 django-filter
 dj-database-url
-psycopg-binary
+psycopg2
+whitenoise

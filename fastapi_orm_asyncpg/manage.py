@@ -124,7 +124,7 @@ async def make_data(seed=0, num_contacts=10):
 
                 # commit this contact
                 await transaction.commit()
-        bar.next()
+                bar.next()
     bar.finish()
     await engine.dispose()
 

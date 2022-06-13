@@ -68,3 +68,13 @@ Some questions about PyPy:
 - How do I manage the availability of packages for 
   a particular developer?
 - How do I deploy into AWS Lambda - using Docker?
+
+## Other Relevant articles
+
+https://calpaterson.com/async-python-is-not-faster.html
+https://blog.mirumee.com/django-fast-part-1-8d068a1b14bc
+https://blog.mirumee.com/django-fast-part-2-d73a4ecd61f3
+https://calpaterson.com/async-python-is-not-faster.html
+https://blog.miguelgrinberg.com/post/ignore-all-web-performance-benchmarks-including-this-one
+https://github.com/psycopg/psycogreen/
+https://techspot.zzzeek.org/2015/02/15/asynchronous-python-and-databases/

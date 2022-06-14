@@ -71,10 +71,13 @@ Some questions about PyPy:
 
 ## Other Relevant articles
 
-https://calpaterson.com/async-python-is-not-faster.html
-https://blog.mirumee.com/django-fast-part-1-8d068a1b14bc
-https://blog.mirumee.com/django-fast-part-2-d73a4ecd61f3
-https://calpaterson.com/async-python-is-not-faster.html
-https://blog.miguelgrinberg.com/post/ignore-all-web-performance-benchmarks-including-this-one
-https://github.com/psycopg/psycogreen/
-https://techspot.zzzeek.org/2015/02/15/asynchronous-python-and-databases/
+When I read up on benchmarks in the community, I see that the attraction to fastapi is not so much the speed as the ability to get your OpenAPI spec. done with Python
+type annotations. I will still complete the benchmark and am still quite attracted to the option of fastapi + aiopg to see whether that will scale well in PyPy.
+
+- https://calpaterson.com/async-python-is-not-faster.html
+- https://blog.mirumee.com/django-fast-part-1-8d068a1b14bc
+- https://blog.mirumee.com/django-fast-part-2-d73a4ecd61f3
+- https://blog.miguelgrinberg.com/post/ignore-all-web-performance-benchmarks-including-this-one
+- https://github.com/psycopg/psycogreen/
+- https://techspot.zzzeek.org/2015/02/15/asynchronous-python-and-databases/
+- https://stackoverflow.com/questions/39815771/how-to-combine-celery-with-asyncio

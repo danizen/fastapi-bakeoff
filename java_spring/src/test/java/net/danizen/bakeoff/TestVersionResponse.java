@@ -28,6 +28,6 @@ public class TestVersionResponse {
 		response.setVersion("0.0.2");
 		assertEquals("0.0.2", response.getVersion());
 	}
-	
+
 	
 }

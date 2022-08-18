@@ -10,9 +10,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-@Getter
-@Setter
 @ToString
 public class VersionResponse {
-	private String version;
+	private @Getter @Setter String version;
 }

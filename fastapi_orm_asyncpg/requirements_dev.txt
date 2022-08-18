@@ -6,4 +6,4 @@ ipython
 mypy			# Test typings if needed
 pytest          	# Run unit tests
 pytest-cov
-psycopg-binary		# For synchronous tasks in manage.py
+psycopg			# For synchronous tasks in manage.py

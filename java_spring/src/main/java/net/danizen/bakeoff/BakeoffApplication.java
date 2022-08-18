@@ -1,9 +1,11 @@
 package net.danizen.bakeoff;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.validation.annotation.Validated;
@@ -23,13 +25,26 @@ public class BakeoffApplication {
 	@Autowired
 	private FibonacciService fibonacciService;
 	
+	
+	@Value("${bakeoff.version}")
+	private String version;
+	
+	@Value("${springdoc.swagger-ui.path}")
+	private String docsPath;
+	
 	public static void main(String[] args) {
 		SpringApplication.run(BakeoffApplication.class, args);
+	}
+	
+	@GetMapping("/")
+	public void redirectToDocs(HttpServletResponse response) {
+		response.setStatus(301);
+		response.setHeader("Location", docsPath);
 	}
 
 	@GetMapping("/version")
 	public VersionResponse getVersion() {
-		return new VersionResponse("0.0.1");
+		return new VersionResponse(version);
 	}
 	
 	@GetMapping("/fibonacci/{number}")

@@ -28,20 +28,20 @@ public class BakeoffApplication {
 
 	@Autowired
 	private FibonacciService fibonacciService;
-	
+
 	@Autowired
 	private ContactsService contactsService;
-	
+
 	@Value("${bakeoff.version}")
 	private String version;
-	
+
 	@Value("${springdoc.swagger-ui.path}")
 	private String docsPath;
-	
+
 	public static void main(String[] args) {
 		SpringApplication.run(BakeoffApplication.class, args);
 	}
-	
+
 	@GetMapping("/")
 	public void redirectToDocs(HttpServletResponse response) {
 		response.setStatus(301);
@@ -52,7 +52,7 @@ public class BakeoffApplication {
 	public VersionResponse getVersion() {
 		return new VersionResponse(version);
 	}
-	
+
 	@GetMapping("/fibonacci/{number}")
 	public FibonacciResponse getFibonacci(@PathVariable @Min(0) @Max(50) int number) {
 		return fibonacciService.getFibonacci(number);

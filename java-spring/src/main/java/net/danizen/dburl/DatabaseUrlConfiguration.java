@@ -1,4 +1,4 @@
-package net.danizen.bakeoff;
+package net.danizen.dburl;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -13,7 +13,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
-public class BakeoffConfiguration {
+public class DatabaseUrlConfiguration {
 	
 	public String getDatabaseURL() throws URISyntaxException, ConfigurationException {
 		String uriString = System.getenv("DATABASE_URL");

@@ -16,16 +16,17 @@
 	<properties>
 		<java.version>11</java.version>
 		<springdoc.version>1.6.10</springdoc.version>
+		<javafaker.version>1.0.2</javafaker.version>
 	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
-		<!-- <dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency> -->
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -52,6 +53,21 @@
       		<artifactId>springdoc-openapi-webmvc-core</artifactId>
       		<version>${springdoc.version}</version>
       	</dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
+      	<dependency>
+      	    <groupId>com.github.javafaker</groupId>
+    	    <artifactId>javafaker</artifactId>
+    	    <version>${javafaker.version}</version>
+        </dependency>
+        <!-- For making a datasource out of DATABASE_URL -->
+        <dependency>
+    		<groupId>com.zaxxer</groupId>
+    		<artifactId>HikariCP</artifactId>
+    		<version>3.4.5</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>

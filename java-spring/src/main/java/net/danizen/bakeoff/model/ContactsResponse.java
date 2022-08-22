@@ -6,28 +6,24 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 @EqualsAndHashCode
 @ToString
 @JsonPropertyOrder({"count", "results"})
+@Getter
+@Setter
 public class ContactsResponse {
 
-	private List<Contact> contacts;
+    private int count;
+	private List<Contact> results;
 
 	public ContactsResponse() {
-		contacts = new ArrayList<Contact>();
+		results = new ArrayList<Contact>();
 	}
-
-	public int getCount() {
-		return contacts.size();
-	}
-
-	public List<Contact> getResults() {
-		return contacts;
-	}
-
 	public void add(Contact contact) {
-		contacts.add(contact);
+		results.add(contact);
 	}
 }

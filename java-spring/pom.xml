@@ -14,7 +14,7 @@
 	<name>bakeoff</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
-		<java.version>11</java.version>
+		<java.version>17</java.version>
 		<springdoc.version>1.6.10</springdoc.version>
 		<javafaker.version>1.0.2</javafaker.version>
 	</properties>

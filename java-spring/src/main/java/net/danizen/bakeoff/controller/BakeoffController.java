@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.danizen.bakeoff.model.Contact;
@@ -65,7 +66,10 @@ public class BakeoffController {
     }
 
     @GetMapping("/contacts")
-    public ContactsResponse getContacts() {
-        return contactsService.getContacts();
+    public ContactsResponse getContacts(
+            @RequestParam(defaultValue = "100") @Min(0) @Max(200) int limit,
+            @RequestParam(defaultValue = "0") @Min(0) int offset,
+            @RequestParam(name = "starts", required = false) String startsWith) {
+        return contactsService.getContacts(limit, offset, startsWith);
     }
 }

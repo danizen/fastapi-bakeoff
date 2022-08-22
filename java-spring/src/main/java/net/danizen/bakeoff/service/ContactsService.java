@@ -1,5 +1,8 @@
 package net.danizen.bakeoff.service;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import net.danizen.bakeoff.model.Contact;
@@ -15,6 +18,7 @@ public class ContactsService {
     private ContactTypeRepository typesRepository;
     private ContactRepository contactRepository;
 
+    @Autowired
     public ContactsService(ContactTypeRepository typesRepository, ContactRepository contactRepository) {
         this.typesRepository = typesRepository;
         this.contactRepository = contactRepository;
@@ -23,9 +27,9 @@ public class ContactsService {
 	public ContactTypesResponse getTypes() {
 	    typesRepository.findAll();
 		var response = new ContactTypesResponse();
-		typesRepository.findAll().forEach(contactType -> {
-		    response.add(contactType);
-		});
+		List<ContactType> contactTypes = typesRepository.findAll();
+		response.setCount(contactTypes.size());
+		response.setResults(contactTypes);
 		return response;
 	}
 
@@ -38,9 +42,15 @@ public class ContactsService {
 		return response;
 	}
 
-	public ContactsResponse getContacts() {
+	public ContactsResponse getContacts(int limit, int offset, String startsWith) {
 		var response = new ContactsResponse();
-		response.add(getContact(22));
+		if (startsWith == null) {
+    		response.setCount(contactRepository.countAll());
+    		response.setResults(contactRepository.findAll(limit, offset));
+		} else {
+		    response.setCount(contactRepository.countStartsWith(startsWith));
+		    response.setResults(contactRepository.findStartsWith(limit, offset, startsWith));
+		}
 		return response;
 	}
 }

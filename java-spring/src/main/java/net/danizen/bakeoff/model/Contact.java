@@ -23,8 +23,16 @@ public class Contact {
 	private @JsonProperty("email") List<String> email;
 
 	public Contact() {
-		phoneNumber = new ArrayList<String>();
-		email = new ArrayList<String>();
+		this.phoneNumber = new ArrayList<String>();
+		this.email = new ArrayList<String>();
+	}
+	public Contact(int id, String firstName, String lastName, ContactType type) {
+	    this.id = id;
+	    this.firstName = firstName;
+	    this.lastName = lastName;
+	    this.type = type;
+        phoneNumber = new ArrayList<String>();
+        email = new ArrayList<String>();
 	}
 
 	public void addPhoneNumber(String phoneNumber) {

@@ -6,15 +6,18 @@ import net.danizen.bakeoff.model.Contact;
 import net.danizen.bakeoff.model.ContactType;
 import net.danizen.bakeoff.model.ContactTypesResponse;
 import net.danizen.bakeoff.model.ContactsResponse;
+import net.danizen.bakeoff.persistence.ContactRepository;
 import net.danizen.bakeoff.persistence.ContactTypeRepository;
 
 @Service
 public class ContactsService {
 
     private ContactTypeRepository typesRepository;
+    private ContactRepository contactRepository;
 
-    public ContactsService(ContactTypeRepository typesRepository) {
+    public ContactsService(ContactTypeRepository typesRepository, ContactRepository contactRepository) {
         this.typesRepository = typesRepository;
+        this.contactRepository = contactRepository;
     }
 
 	public ContactTypesResponse getTypes() {

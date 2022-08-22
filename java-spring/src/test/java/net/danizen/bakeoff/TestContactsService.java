@@ -19,11 +19,11 @@ public class TestContactsService {
 	public void testGetTypes() {
 		var actual = service.getTypes();
 		var results = actual.getResults();
-		
+
 		assertEquals(3, results.size());
 		assertEquals(3, actual.getCount());
-		assertEquals(new ContactType(1, "Relative"), results.get(0));
-		assertEquals(new ContactType(2, "Friend"), results.get(1));
-		assertEquals(new ContactType(3, "Coworker"), results.get(2));
+		assertEquals(new ContactType(1, "Friends"), results.get(0));
+		assertEquals(new ContactType(2, "Relatives"), results.get(1));
+		assertEquals(new ContactType(3, "Coworkers"), results.get(2));
 	}
 }

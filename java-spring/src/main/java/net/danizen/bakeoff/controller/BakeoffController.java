@@ -23,10 +23,7 @@ import net.danizen.bakeoff.service.FibonacciService;
 @Validated
 public class BakeoffController {
 
-    @Autowired
     private FibonacciService fibonacciService;
-
-    @Autowired
     private ContactsService contactsService;
 
     @Value("${bakeoff.version}")
@@ -34,6 +31,12 @@ public class BakeoffController {
 
     @Value("${springdoc.swagger-ui.path}")
     private String docsPath;
+
+    @Autowired
+    public BakeoffController(FibonacciService fibonacciService, ContactsService contactsService) {
+        this.fibonacciService = fibonacciService;
+        this.contactsService = contactsService;
+    }
 
     @GetMapping("/")
     public void redirectToDocs(HttpServletResponse response) {

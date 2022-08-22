@@ -16,6 +16,5 @@ public class FibonacciResponse {
 	public FibonacciResponse(int result) {
 	    this.result = result;
 	}
-	public FibonacciResponse() {
-	}
+	public FibonacciResponse() {}
 }

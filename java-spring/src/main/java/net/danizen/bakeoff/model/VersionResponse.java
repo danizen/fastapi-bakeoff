@@ -14,6 +14,5 @@ public class VersionResponse {
 	public VersionResponse(String version) {
 	    this.version = version;
 	}
-	public VersionResponse() {
-	}
+	public VersionResponse() {}
 }

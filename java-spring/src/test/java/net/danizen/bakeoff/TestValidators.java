@@ -20,7 +20,7 @@ public class TestValidators {
     private ConstraintValidatorContext validatorContext;
 
     @Test
-    public void testPunctuationIsBAD() {
+    public void punctuationBAD() {
         PunctuationFreeValidator validator = new PunctuationFreeValidator();
         validator.initialize(punctFree);
         boolean result = validator.isValid("Dan?", validatorContext);
@@ -28,7 +28,7 @@ public class TestValidators {
     }
 
     @Test
-    public void testNullIsOK() {
+    public void nullOK() {
         PunctuationFreeValidator validator = new PunctuationFreeValidator();
         validator.initialize(punctFree);
         boolean result = validator.isValid(null, validatorContext);
@@ -36,11 +36,26 @@ public class TestValidators {
     }
 
     @Test
-    public void testNormalIsOK() {
+    public void normalOK() {
         PunctuationFreeValidator validator = new PunctuationFreeValidator();
         validator.initialize(punctFree);
         boolean result = validator.isValid("Dan", validatorContext);
         assertTrue(result);
-
     }
-}
+
+    @Test
+    public void chineseNameOK() {
+        PunctuationFreeValidator validator = new PunctuationFreeValidator();
+        validator.initialize(punctFree);
+        boolean result = validator.isValid("杨", validatorContext);
+        assertTrue(result);
+    }
+
+    @Test
+    public void accentedNameOK() {
+        PunctuationFreeValidator validator = new PunctuationFreeValidator();
+        validator.initialize(punctFree);
+        boolean result = validator.isValid("Yáng", validatorContext);
+        assertTrue(result);
+    }
+ }

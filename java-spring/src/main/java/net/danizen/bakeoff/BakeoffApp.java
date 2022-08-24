@@ -13,12 +13,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 
 @SpringBootApplication
-public class BakeoffApplication implements ApplicationContextAware {
-    // this is for testing only
-    private static ApplicationContext bakeoffContext;
+public class BakeoffApp implements ApplicationContextAware {
+    private static ApplicationContext bakeoffContext = null;
 
 	public static void main(String[] args) {
-		SpringApplication.run(BakeoffApplication.class, args);
+		SpringApplication.run(BakeoffApp.class, args);
 	}
 
 	@Bean(name = "jdbcTemplate")

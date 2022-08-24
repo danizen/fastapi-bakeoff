@@ -6,6 +6,7 @@ import javax.validation.constraints.Min;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,9 +20,11 @@ import net.danizen.bakeoff.model.FibonacciResponse;
 import net.danizen.bakeoff.model.VersionResponse;
 import net.danizen.bakeoff.service.ContactsService;
 import net.danizen.bakeoff.service.FibonacciService;
+import net.danizen.bakeoff.validation.PunctuationFree;
 
 @RestController
 @Validated
+@Profile("!jshell")
 public class BakeoffController {
 
     private FibonacciService fibonacciService;
@@ -69,7 +72,7 @@ public class BakeoffController {
     public ContactsResponse getContacts(
             @RequestParam(defaultValue = "100") @Min(0) @Max(200) int limit,
             @RequestParam(defaultValue = "0") @Min(0) int offset,
-            @RequestParam(name = "starts", required = false) String startsWith) {
+            @RequestParam(name = "starts", required = false) @PunctuationFree String startsWith) {
         return contactsService.getContacts(limit, offset, startsWith);
     }
 }

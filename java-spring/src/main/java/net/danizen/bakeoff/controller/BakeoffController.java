@@ -3,16 +3,24 @@ package net.danizen.bakeoff.controller;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Path.Node;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import net.danizen.bakeoff.model.ErrorResponse;
 import net.danizen.bakeoff.model.Contact;
 import net.danizen.bakeoff.model.ContactTypesResponse;
 import net.danizen.bakeoff.model.ContactsResponse;
@@ -72,7 +80,29 @@ public class BakeoffController {
     public ContactsResponse getContacts(
             @RequestParam(defaultValue = "100") @Min(0) @Max(200) int limit,
             @RequestParam(defaultValue = "0") @Min(0) int offset,
-            @RequestParam(name = "starts", required = false) @PunctuationFree String startsWith) {
-        return contactsService.getContacts(limit, offset, startsWith);
+            @RequestParam(required = false) @PunctuationFree String starts) {
+        return contactsService.getContacts(limit, offset, starts);
     }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException ex) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST);
+        ex.getConstraintViolations().stream().forEach(violation -> {
+            String field = null;
+            for (Node node : violation.getPropertyPath()) {
+                field = node.getName();
+            }
+            error.addMessage(field, violation.getMessage());
+        });
+        return new ResponseEntity<ErrorResponse>(error, new HttpHeaders(), error.getStatus());
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeException(MethodArgumentTypeMismatchException ex) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST);
+        String field = ex.getParameter().getParameterName();
+        error.addMessage(field, ex.getMessage());
+        return new ResponseEntity<ErrorResponse>(error, new HttpHeaders(), error.getStatus());
+    }
+
 }

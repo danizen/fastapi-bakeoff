@@ -6,11 +6,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import javax.validation.ConstraintValidatorContext;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import net.danizen.bakeoff.validation.PunctuationFree;
 import net.danizen.bakeoff.validation.PunctuationFreeValidator;
 
+@ExtendWith(MockitoExtension.class)
 public class TestValidators {
 
     @Mock

@@ -25,7 +25,6 @@ public class ContactsService {
     }
 
 	public ContactTypesResponse getTypes() {
-	    typesRepository.findAll();
 		var response = new ContactTypesResponse();
 		List<ContactType> contactTypes = typesRepository.findAll();
 		response.setCount(contactTypes.size());

@@ -33,11 +33,7 @@ public class ContactsService {
 	}
 
 	public Contact getContact(int id) {
-		var response = new Contact();
-		response.setId(id);
-		response.setFirstName("Sarah");
-		response.setLastName("Avery");
-		response.setType(new ContactType(1, "Relative"));
+		var response = contactRepository.findContactById(id);
 		return response;
 	}
 

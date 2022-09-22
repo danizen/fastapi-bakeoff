@@ -1,17 +1,16 @@
 package net.danizen.bakeoff;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import net.danizen.bakeoff.model.Contact;
 import net.danizen.bakeoff.model.ContactType;
 
-@SpringBootTest
+
 public class TestContact {
     private List<Contact> contacts;
 
@@ -26,33 +25,34 @@ public class TestContact {
     @Test
     public void testNoArgConstructor() {
         Contact actual = new Contact();
-        assertEquals(0, actual.getId());
-        assertEquals(null, actual.getFirstName());
-        assertEquals(null, actual.getLastName());
-        assertEquals(null, actual.getType());
-        assertEquals(0, actual.getPhoneNumbers().size());
-        assertEquals(0, actual.getEmails().size());
+        assertThat(actual.getId()).isEqualTo(0);
+        assertThat(actual.getFirstName()).isNull();
+        assertThat(actual.getLastName()).isNull();
+        assertThat(actual.getType()).isNull();
+        assertThat(actual.getPhoneNumbers()).size().isEqualTo(0);
+        assertThat(actual.getEmails()).size().isEqualTo(0);
     }
 
     @Test
     public void testArgsConstructor() {
         Contact actual = contacts.get(0);
-        assertEquals(3, actual.getId());
-        assertEquals("Glen", actual.getFirstName());
-        assertEquals("Young", actual.getLastName());
-        assertEquals("Testing", actual.getType().getName());
+        assertThat(actual.getId()).isEqualTo(3);
+        assertThat(actual.getFirstName()).isEqualTo("Glen");
+        assertThat(actual.getLastName()).isEqualTo("Young");
+        assertThat(actual.getType().getName()).isEqualTo("Testing");
     }
 
     @Test
     public void testToCommaDelimited() {
         String actual = Contact.toCommaDelimitedIdString(contacts);
-        assertEquals("3, 1, 2", actual);
+        assertThat(actual).isEqualTo("3, 1, 2");
     }
 
     @Test
     public void testToMap() {
         Map<Integer, Contact> actual = Contact.toMap(contacts);
-        assertEquals(3, actual.size());
-        assertEquals("Brubeck", actual.get(2).getLastName());
+        assertThat(actual).size().isEqualTo(3);
+        assertThat(actual).containsOnlyKeys(3, 1, 2);
+        assertThat(actual.get(2).getLastName()).isEqualTo("Brubeck");
     }
 }

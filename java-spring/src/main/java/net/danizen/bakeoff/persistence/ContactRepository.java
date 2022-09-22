@@ -86,6 +86,23 @@ public class ContactRepository {
 
     }
 
+    public Contact findContactById(int contact_id) {
+        String sql = """
+                SELECT
+                    c.contact_id,
+                    c.first_name,
+                    c.last_name,
+                    ct.type_id,
+                    ct.type_name
+                FROM contacts c
+                JOIN contact_types ct ON (c.type_id = ct.type_id)
+                WHERE c.contact_id =  ?
+                """;
+       Contact contact = jdbcTemplate.queryForObject(sql, new ContactMapper(), contact_id);
+       addPhoneAndEmail(List.of(contact));
+       return contact;
+    }
+
     public Integer countAll() {
         String sql = "SELECT COUNT(contact_id) FROM contacts";
         return jdbcTemplate.queryForObject(sql, Integer.class);

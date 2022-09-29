@@ -1,19 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog
-	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
-	xmlns:pro="http://www.liquibase.org/xml/ns/pro"
-	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
-		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
-		http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
-    <changeSet id="1" author="Liquibase">
-        <createTable tableName="test_table">
-            <column name="test_id" type="int">
-            <constraints primaryKey="true"/>
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+
+    <!-- Initial database schema -->
+    <changeSet id="01 - create contact_types" author="Dan Davis">
+        <createTable tableName="contact_types">
+            <column name="type_id" type="INT" autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true" primaryKeyName="PK_CONTACT_TYPES"/>
             </column>
-            <column name="test_column" type="varchar"/>
+            <column name="type_name" type="VARCHAR(30)"/>
         </createTable>
+    </changeSet>
+    <changeSet id="02 - initialize contact_types" author="Dan Davis">
+        <insert tableName="contact_types">
+            <column name="type_name" value="Relatives" />
+        </insert>
+        <insert tableName="contact_types">
+            <column name="type_name" value="Friends" />
+        </insert>
+        <insert tableName="contact_types">
+            <column name="type_name" value="Colleagues" />
+        </insert>
+    </changeSet>
+    <changeSet id="03 - create contacts" author="Dan Davis">
+        <createTable tableName="contacts">
+            <column name="contact_id" type="INT" autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true" primaryKeyName="PK_CONTACTS"/>
+            </column>
+            <column name="first_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint
+            constraintName="FK_CONTACT_TYPE"
+            baseTableName="contacts" baseColumnNames="type_id"
+            referencedTableName="contact_types" referencedColumnNames="type_id"/>
+    </changeSet>
+    <changeSet id="04 - create contact_phones" author="Dan Davis">
+        <createTable tableName="contact_phones">
+            <column name="phone_id" type="INT" autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true" primaryKeyName="PK_CONTACT_PHONES"/>
+            </column>
+            <column name="phone_number" type="VARCHAR(30)"/>
+            <column name="contact_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint
+            constraintName="FK_CONTACT_PHONES_CONTACT"
+            baseTableName="contact_phones" baseColumnNames="contact_id"
+            referencedTableName="contacts" referencedColumnNames="contact_id"/>
+    </changeSet>
+    <changeSet id="05 - create contact_emails" author="Dan Davis">
+        <createTable tableName="contact_emails">
+            <column name="email_id" type="INT" autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true" primaryKeyName="PK_CONTACT_EMAILS"/>
+            </column>
+            <column name="email_address" type="VARCHAR(256)"/>
+            <column name="contact_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint
+            constraintName="FK_CONTACT_EMAILS_CONTACT"
+            baseTableName="contact_emails" baseColumnNames="contact_id"
+            referencedTableName="contacts" referencedColumnNames="contact_id"/>
     </changeSet>
 </databaseChangeLog>

@@ -2,3 +2,6 @@
 *.pyo
 /dist/
 *.zip
+# terraform directory and state
+.terraform/
+.terraform.lock.hcl

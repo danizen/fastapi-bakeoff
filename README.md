@@ -14,30 +14,27 @@ Another nice to have which seems less essential to me is to have API schema gene
 
 Each of the sub-directories implements one combination of layers. One of these implementations will be a control cases:
 
-- golang_bun - this combines golang and bun, a go-native PostgreSQL driver.
+- java-spring - this combines Java/Spring 5/Spring boot and uses Liquibase to manage the schema
 
-The following implementations will be test cases:
+The following implementations are test cases:
 
 - django - combines gunicorn + uvicorn for Async scaling, djangorestframework, Django, and psycopg-binary.
-- fastapi_asyncpg - Combines fastapi, starlette, pydantic, and asyncpg.
-- fastapi_orm_asyncpg - Combines fastapi, starlette, pydantic, sqlalchemy ORM, and asyncpg
-- fastapi_aiopg - Combines fastapi, starlette, pydantic, aiopg, and psycopg-binary.
+- fastapi-asyncpg - Combines fastapi, starlette, pydantic, and asyncpg.
+- fastapi-orm-asyncpg - Combines fastapi, starlette, pydantic, sqlalchemy ORM, and asyncpg
+
+Additional data points in future:
+
+- fastapi-aiopg - Since aiopg is pure Python, we will test with pypy.
+- golang-bun - Combines golang with the leading Go ORM - bun
+
 
 ## API
 
 - /version - tests basic response time
-- /contacts/fast - tests fastest way to retrieve the contacts - `connection.fetch(sql, *params)` for asyncpg, and SQLAlchemy Core where that is involved.
-- /contacts/orm - tests slower way to retrieve the contacts - `async for record in connection.execute(sql, *params)` for asyncpg, and SQL Alchemy ORM where that is invovled.
+- /contacts/ - retrieves a list of contacts.  This is carefully controlled so that it is paged,
+can be filtered by last name, and requires 3 queries per page, always.
+- /contacts/<id> - retrieves one contact - also requires 3 queries per result.
 - /types - returns the contact types.  This is a smaller amount of JSON, and so JSON rendering should be less important. This is also a single SQL statement rather than involving joining and prefetching of related table data.
-
-## Database Drivers
-
-Four Python database driver layers are involved:
-* aiopg - uses psycopg-binary in asynchronous mode
-* asyncpg - Native Cython driver built for Asynchronous python
-* Django - layered on top of psycopg-binary
-
-Within Golang, we use only the leading driver, bun, which is as a base case.
 
 ## Hypothesis
 

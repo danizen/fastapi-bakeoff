@@ -5,3 +5,6 @@
 # terraform directory and state
 .terraform/
 .terraform.lock.hcl
+*.tfstate
+*.tfstate.backup
+

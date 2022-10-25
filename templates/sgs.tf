@@ -21,7 +21,7 @@ resource "aws_security_group" "bastion" {
   }
 
   tags = {
-    name = "${var.vpc_name}-bastion"
+    Name = "${var.vpc_name}-bastion"
   }
 }
 
@@ -63,7 +63,7 @@ resource "aws_security_group" "instance" {
   }
 
   tags = {
-    name = "${var.vpc_name}-web-instance"
+    Name = "${var.vpc_name}-web-instance"
   }
 
 }

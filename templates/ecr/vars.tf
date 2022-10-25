@@ -1,3 +1,4 @@
-variable "repo_name" {
-  default = "fubar"
+variable "repo_names" {
+  type = list(string)
+  default = []
 }

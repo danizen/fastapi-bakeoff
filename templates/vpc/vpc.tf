@@ -1,7 +1,7 @@
 resource "aws_vpc" "vpc" {
   cidr_block = var.vpc_cidr
 
-  enable_dns_support = true
+  enable_dns_support   = true
   enable_dns_hostnames = true
 
   tags = {
@@ -17,7 +17,6 @@ resource "aws_internet_gateway" "gw" {
   }
 }
 
-
 resource "aws_egress_only_internet_gateway" "gw" {
   vpc_id = aws_vpc.vpc.id
 
@@ -26,34 +25,39 @@ resource "aws_egress_only_internet_gateway" "gw" {
   }
 }
 
-## Not sure these are needed with the the vpc_id specified
-#
-# resource "aws_internet_gateway_attachment" "gw" {
-#   internet_gateway_id = aws_internet_gateway.gw.id
-#   vpc_id              = aws_vpc.vpc.id
-# }
-#
-# resource "aws_internet_gateway_attachment" "gw" {
-#   internet_gateway_id = aws_internet_gateway.gw.id
-#   vpc_id              = aws_vpc.vpc.id
-# }
-
-# route table without subnets
+# route table for public subnets
 resource "aws_default_route_table" "rt" {
   default_route_table_id = aws_vpc.vpc.default_route_table_id
 
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.gw.id
+  tags = {
+    Name = "${var.vpc_name}-public-rt"
   }
+}
 
-  route {
-    ipv6_cidr_block        = "::/0"
-    egress_only_gateway_id = aws_egress_only_internet_gateway.gw.id
-  }
+resource "aws_route" "gw" {
+  route_table_id         = aws_default_route_table.rt.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.gw.id
+  depends_on             = [aws_default_route_table.rt]
+}
+
+resource "aws_route" "gw6" {
+  route_table_id              = aws_default_route_table.rt.id
+  destination_ipv6_cidr_block = "::0/0"
+  egress_only_gateway_id      = aws_egress_only_internet_gateway.gw.id
+  depends_on                  = [aws_default_route_table.rt]
+}
+
+# public subnets
+resource "aws_subnet" "public" {
+  vpc_id = aws_vpc.vpc.id
+
+  for_each          = toset(var.subnet_azs)
+  cidr_block        = cidrsubnet(local.public_cidr, 4, index(var.subnet_azs, each.key))
+  availability_zone = each.value
 
   tags = {
-    Name = "${var.vpc_name}-rtb"
+    Name = "${var.vpc_name}-public-${index(var.subnet_azs, each.key) + 1}"
   }
 }
 

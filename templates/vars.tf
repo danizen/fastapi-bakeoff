@@ -1,4 +1,4 @@
-variable "vpc_region" {
+variable "region_name" {
   type    = string
   default = "us-east-1"
 }
@@ -13,7 +13,7 @@ variable "vpc_name" {
   default = "bakeoff"
 }
 
-variable "subnet_azs" {
+variable "vpc_subnet_zones" {
   type = list(string)
   default = [
     "us-east-1a",
@@ -21,7 +21,7 @@ variable "subnet_azs" {
   ]
 }
 
-variable "nat_az" {
-  type    = string
-  default = null
+variable "redundant_nat" {
+  type = bool
+  default = false
 }

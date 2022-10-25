@@ -25,3 +25,10 @@ variable "redundant_nat" {
   type = bool
   default = false
 }
+
+variable "repo_names" {
+  type = list(string)
+  default = [
+    "bakeoff",
+  ]
+}

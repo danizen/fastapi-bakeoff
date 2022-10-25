@@ -3,30 +3,6 @@ resource "random_password" "db" {
   special = false
 }
 
-resource "aws_security_group" "db" {
-  name        = "${var.cluster_name}-postgres-sg"
-  description = "Allow SSH, HTTPS, HTTP from VPC"
-  vpc_id      = module.vpc.vpc_id
-
-  ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    cidr_blocks = [var.cidr]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "${var.cluster_name}-postgres-sg"
-  }
-}
-
 resource "aws_db_parameter_group" "db" {
   name   = "${var.cluster_name}-pg-parameter-group"
   family = "postgres13"

@@ -22,7 +22,7 @@ variable "vpc_subnet_zones" {
 }
 
 variable "redundant_nat" {
-  type = bool
+  type    = bool
   default = false
 }
 

@@ -6,8 +6,11 @@ terraform {
       version = "~> 4.0"
     }
     random = {
-      source = "hashicorp/random"
+      source  = "hashicorp/random"
       version = "~> 3.4.3"
+    }
+    http = {
+      version = ">= 1.1.1"
     }
   }
 }
@@ -18,6 +21,7 @@ provider "aws" {
 
 provider "random" {}
 
+
 # derived from vars
 locals {
   # divide the address space into public, private and backend
@@ -26,26 +30,26 @@ locals {
   backend_cidr = cidrsubnet(var.vpc_cidr, 4, 2)
 
   # invert logic 
-  single_nat_gateway = (var.redundant_nat ? false : true) 
+  single_nat_gateway = (var.redundant_nat ? false : true)
 
   # make sure is bool
   enable_dns_hostnames = true
 
   # calculate public subnet cidrs
   public_subnet_cidrs = [
-    for i, az in var.vpc_subnet_zones: 
-      cidrsubnet(local.public_cidr, 4, i)
+    for i, az in var.vpc_subnet_zones :
+    cidrsubnet(local.public_cidr, 4, i)
   ]
 
   # calculate private subnet cidrs
   private_subnet_cidrs = [
-    for i, az in var.vpc_subnet_zones: 
-      cidrsubnet(local.private_cidr, 4, i)
+    for i, az in var.vpc_subnet_zones :
+    cidrsubnet(local.private_cidr, 4, i)
   ]
 
   # caldulate backend subnet cidrs
   backend_subnet_cidrs = [
-    for i, az in var.vpc_subnet_zones: 
-      cidrsubnet(local.backend_cidr, 4, i)
+    for i, az in var.vpc_subnet_zones :
+    cidrsubnet(local.backend_cidr, 4, i)
   ]
 }

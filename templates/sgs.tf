@@ -19,6 +19,10 @@ resource "aws_security_group" "bastion" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    name = "${var.vpc_name}-bastion"
+  }
 }
 
 # instance security group - port 22, 80, and 443
@@ -57,4 +61,9 @@ resource "aws_security_group" "instance" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    name = "${var.vpc_name}-web-instance"
+  }
+
 }

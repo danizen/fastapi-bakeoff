@@ -62,7 +62,7 @@ to run the fastapi_aiopg on PyPy as a test.
 
 Some questions about PyPy:
 - How do I convince my DevOps to install PyPy?
-- How do I convince DSS to install PyPy?
+- How do I convince desktop support to install PyPy (gitpod may address this)?
 - How do I manage the availability of packages for 
   a particular developer?
 - How do I deploy into AWS Lambda - using Docker?

@@ -30,11 +30,12 @@ Additional data points in future:
 
 ## API
 
-- /version - tests basic response time
-- /contacts/ - retrieves a list of contacts.  This is carefully controlled so that it is paged,
+- `/version` - tests basic response time
+- '/fibanacci/<number>` - tests what happens in asyncio when a tight computation is hit
+- `/contacts/` - retrieves a list of contacts.  This is carefully controlled so that it is paged,
 can be filtered by last name, and requires 3 queries per page, always.
-- /contacts/<id> - retrieves one contact - also requires 3 queries per result.
-- /types - returns the contact types.  This is a smaller amount of JSON, and so JSON rendering should be less important. This is also a single SQL statement rather than involving joining and prefetching of related table data.
+- `/contacts/<id>` - retrieves one contact - also requires 3 queries per result.
+- `/type`s - returns the contact types.  This is a smaller amount of JSON, and so JSON rendering should be less important. This is also a single SQL statement rather than involving joining and prefetching of related table data.
 
 ## Hypothesis
 

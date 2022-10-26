@@ -1,4 +1,4 @@
-# Python Webapp Performance Test
+# FastAPI Webapp Performance Test
 
 ## Summary
 

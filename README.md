@@ -8,7 +8,7 @@ Web applications are evolving away from serving templated HTML and towards being
 * Without asyncio, the problems of managing database connections are made worse as we parallelize though multiple processes – the drivers are not built so that multiple processes can share database connections, and so pursuing parallelism through multiple processes introduces issues with connection pooling.  I think AWS RDS Proxy (or pgbouncer) are good solutions here, but would like to improve things on the application side. Oracle DRCP addresses this for Oracle, but is not implemented at my workplace.
 * The Django ORM is great for developers who don’t want to think about the database and don’t know SQL, but every ORM is a "leaky abstraction".  The best ORMs are aware of this, and strive to write very much like SQL to enable transfer learning. Django's ORM doesn’t fall into this camp.
 
-Another nice to have which seems less essential to me is to have API schema generation and validation baked into the architecture. This is why fastapi is the async framework I am trying here. I know how to do this as well with Django, and so will not reproduce the steps in this repository, at least not initially.  All of these will seek to following the tenets of the twelve factor app.
+Another nice to have which seems less essential to me is to have API schema generation and validation baked into the architecture. This is why fastapi is the async framework I am trying here. I know how to do this well with Django, and will reproduce the steps in the django implementation here.  All of these will follow the tenets of the twelve factor app.
 
 ## Implementations
 

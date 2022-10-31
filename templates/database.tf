@@ -82,10 +82,11 @@ resource "aws_db_subnet_group" "db" {
 }
 
 resource "aws_db_instance" "db" {
-  allocated_storage   = 5
+  identifier          = "${var.cluster_name}-db"
   db_name             = var.cluster_name
   engine              = "postgres"
   engine_version      = "13.7"
+  allocated_storage   = 5
   instance_class      = var.database_instance_type
   username            = var.database_user
   password            = random_password.db.result

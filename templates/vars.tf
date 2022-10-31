@@ -52,3 +52,8 @@ variable "database_user" {
   type    = string
   default = "app"
 }
+
+variable "aws_system_master" {
+  type    = string
+  default = "dan"
+}

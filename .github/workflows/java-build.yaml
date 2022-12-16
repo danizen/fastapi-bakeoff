@@ -1,5 +1,5 @@
-name: Build and Push Images
-run-name: Builds each sub-drectory into a container
+name: Build JAR File
+run-name: Build JAR File
 on:
   push:
     branches: ['main', 'master']

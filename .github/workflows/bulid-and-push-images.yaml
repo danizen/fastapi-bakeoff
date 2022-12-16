@@ -9,10 +9,21 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-      - name: Determine container versions
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: 17
+          distribution: zulu
+          cache: maven
+      - name: Maven build
+        run: cd java-spring && mvn clean package
+      - name: Update environment
         run: |
-          VERSION=${{ github.event.release.tag_name }}
-          echo "VERSION=${VERSION:1}" >> $GITHUB_ENV
+          VVERSION=${{ github.event.release.tag_name }}
+          VERSION=${VVERSION:1}
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          mv java-spring/target/bakeoff-*.jar java-spring/target/bakeoff-${VERSION}.jar
+          echo "JAR=target/bakeoff-${VERSION.jar}" >> $GITHUB_ENV
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       - name: Login to Docker Hub
@@ -50,5 +61,13 @@ jobs:
             danizen/bakeoff-fastapi-orm-asyncpg:${{ env.VERSION }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      - name: Build and push bakeoff-java-spring:${{ env.VERSION }}
+        uses: docker/build-push-action@v3
+        with:
+          context: "{{defaultContext}}:java-spring"
+          push: true
+          tags: |
+            danizen/bakeoff-java-spring:latest
+            danizen/bakeoff-java-spring:${{ env.VERSION }}
       - name: Report Status
         run: echo "🍏 Built and Pushed danizen/bakeoff-django:${{ env.VERSION }}"

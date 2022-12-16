@@ -3,8 +3,10 @@ run-name: Builds each sub-drectory into a container
 on:
   push:
     branches: ['main', 'master']
+  release:
+    types: ['published', 'prerelease']
 jobs:
-  build-containers:
+  build-java-package:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout Code
@@ -17,3 +19,8 @@ jobs:
           cache: maven
       - name: Maven build
         run: cd java-spring && mvn clean package
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v3
+        with:
+          name: JAR File
+          path: java-spring/target/bakeoff-*.jar

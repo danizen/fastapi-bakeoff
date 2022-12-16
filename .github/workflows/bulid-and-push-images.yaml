@@ -26,6 +26,8 @@ jobs:
         with:
           context: "{{defaultContext}}:django"
           push: true
-          tags: danizen/bakeoff-django:latest danizen/bakeoff-django:${{ env.VERSION }}
+          tags: |
+            danizen/bakeoff-django:latest
+            danizen/bakeoff-django:${{ env.VERSION }}
       - name: Report Status
         run: echo "🍏 Built and Pushed danizen/bakeoff-django:${{ env.VERSION }}"

@@ -23,7 +23,7 @@ jobs:
           VERSION=${VVERSION:1}
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
           mv java-spring/target/bakeoff-*.jar java-spring/target/bakeoff-${VERSION}.jar
-          echo "JAR=target/bakeoff-${VERSION.jar}" >> $GITHUB_ENV
+          echo "JAR=target/bakeoff-${VERSION}.jar" >> $GITHUB_ENV
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       - name: Login to Docker Hub

@@ -21,6 +21,5 @@ jobs:
         with:
           context: "{{defaultContext}}:django"
           push: true
-          tags:
-            - danizen/bakeoff-django:latest
+          tags: danizen/bakeoff-django:latest
       - run: echo "🍏 Build and Pushed tag ${{ env.GITHUB_REF }} ${{ job.status }}."

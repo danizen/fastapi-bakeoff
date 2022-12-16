@@ -9,11 +9,10 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-      - name: Setup VERSION variable
+      - name: Determine container versions
         run: |
           VERSION=${{ github.event.release.tag_name }}
           echo "VERSION=${VERSION:1}" >> $GITHUB_ENV
-          echo "VERSION=${VERSION:1}"
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       - name: Login to Docker Hub
@@ -29,5 +28,27 @@ jobs:
           tags: |
             danizen/bakeoff-django:latest
             danizen/bakeoff-django:${{ env.VERSION }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Build and push bakeoff-fastapi-asyncpg
+        uses: docker/build-push-action@v3
+        with:
+          context: "{{defaultContext}}:fastapi-asyncpg"
+          push: true
+          tags: |
+            danizen/bakeoff-fastapi-asyncpg:latest
+            danizen/bakeoff-fastapi-asyncpg:${{ env.VERSION }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Build and push bakeoff-fastapi-orm-asyncpg
+        uses: docker/build-push-action@v3
+        with:
+          context: "{{defaultContext}}:fastapi-orm-asyncpg"
+          push: true
+          tags: |
+            danizen/bakeoff-fastapi-orm-asyncpg:latest
+            danizen/bakeoff-fastapi-orm-asyncpg:${{ env.VERSION }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
       - name: Report Status
         run: echo "🍏 Built and Pushed danizen/bakeoff-django:${{ env.VERSION }}"

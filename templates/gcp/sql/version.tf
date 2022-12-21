@@ -16,8 +16,9 @@ terraform {
 }
 
 provider "google" {
-  region = var.region_name
-  zone   = var.zone_name
+  project = "${var.project_prefix}-bakeoff"
+  region  = var.region_name
+  zone    = var.zone_name
 }
 
 provider "random" {}

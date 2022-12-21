@@ -1,11 +1,15 @@
 variable "region_name" {
-  default = "us-east4"
+  type    = string
 }
 
 variable "zone_name" {
-  default = "us-east4-b"
+  type    = string
 }
 
 variable "database_name" {
   default = "bakeoff"
+}
+
+variable "project_prefix" {
+  type    = string
 }

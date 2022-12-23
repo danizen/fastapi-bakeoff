@@ -5,3 +5,4 @@ djangorestframework
 django-filter
 psycopg2
 whitenoise
+wheel       # needed in future to install psycopg2

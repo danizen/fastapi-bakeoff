@@ -61,9 +61,11 @@ jobs:
             danizen/bakeoff-fastapi-orm-asyncpg:${{ env.VERSION }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      - name: investigate environment
+        run: env
       - name: Build and push bakeoff-java-spring:${{ env.VERSION }}
         env:
-          JAR=${{ env.JAR }}
+          JAR: ${{ env.JAR }}
         uses: docker/build-push-action@v3
         with:
           context: "{{defaultContext}}:java-spring"

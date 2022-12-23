@@ -3,6 +3,5 @@ gunicorn
 uvicorn
 djangorestframework
 django-filter
-dj-database-url
 psycopg2
 whitenoise

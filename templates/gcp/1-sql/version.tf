@@ -16,7 +16,7 @@ terraform {
 }
 
 provider "google" {
-  project = "${var.project_prefix}-bakeoff"
+  project = var.database_project
   region  = var.region_name
   zone    = var.zone_name
 }

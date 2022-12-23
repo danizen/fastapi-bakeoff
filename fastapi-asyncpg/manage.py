@@ -53,15 +53,7 @@ async def make_contacts(faker, contact_types, num_contacts=10):
         first_name = faker.first_name()
         last_name = faker.last_name()
         type_id = faker.random.choice(contact_types)
-        if faker.random.random() < 0.4:
-            phone_number = faker.phone_number()
-        else:
-            phone_number = None
-        if faker.random.random() < 0.7:
-            email = faker.email()
-        else:
-            email = None
-        yield (first_name, last_name, type_id, phone_number, email)
+        yield (first_name, last_name, type_id)
         bar.next()
     bar.finish()
 
@@ -86,8 +78,6 @@ async def make_data(seed=0, num_contacts=10):
             'first_name',
             'last_name',
             'type_id',
-            'phone_number',
-            'email'
         ]
     )
 

@@ -10,8 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import os
 from pathlib import Path
-import dj_database_url
+
+from django.core.exceptions import ImproperlyConfigured
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -82,8 +85,23 @@ REST_FRAMEWORK = {
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+__host = os.environ.get('PGDB_HOST')
+__username = os.environ.get('PGDB_USERNAME')
+__password = os.environ.get('PGDB_PASSWORD')
+__name = os.environ.get('PGDB_DATABASE')
+
+if not (__host and __username and __password and __name):
+    raise ImproperlyConfigured('Need environment variables PGDB_HOST, PGDB_DATABASE, PGDB_USERNAME, and PGDB_PASSWORD')
+
 DATABASES = {
-    'default': dj_database_url.config(conn_max_age=600, ssl_require=False)
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': __name,
+        'USER': __username,
+        'PASSWORD': __password,
+        'HOST': __host,
+        'CONN_MAX_AGE': 600,
+    }
 }
 
 

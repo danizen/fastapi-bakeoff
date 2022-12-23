@@ -3,6 +3,7 @@ import asyncio
 import os
 import sys
 from argparse import ArgumentParser, ArgumentTypeError
+from urllib.parse import quote_plus
 
 import uvicorn
 from sqlalchemy import (
@@ -11,6 +12,7 @@ from sqlalchemy import (
     insert,
     select
 )
+from sqlalchemy.engine.url import URL
 from faker import Faker
 from progress.bar import Bar
 
@@ -45,9 +47,6 @@ def command_runserver(opts):
     else:
         host = host_and_port[0]
         port = 8000
-    if 'DATABASE_URL' not in os.environ:
-        print('DATABASE_URL environment variable is required', file=sys.stderr)
-        raise SystemExit(1)
     if opts.reload:
         uvicorn.run('backend.app:app', host=host, port=port, reload=True)
     else:
@@ -64,8 +63,20 @@ def command_sqlmigrate(opts):
 
 def command_migrate(opts):
     settings = get_settings()
-    dsn = str(settings.database_url)
-    engine = create_engine(dsn)
+    host_or_path = settings.pgdb_host
+    # SQL Alchemy decision to make it all an URL combined with CloudRun
+    # decision to use domain sockets means we get this.
+    query = {
+        'host': host_or_path
+    }
+    url = URL.create(
+        drivername='postgresql',
+        username=settings.pgdb_username,
+        password=settings.pgdb_password,
+        database=settings.pgdb_database,
+        query=query
+    )
+    engine = create_engine(url)
     Base.metadata.create_all(engine)
     with engine.connect() as conn:
         with conn.begin() as transaction:

@@ -1,0 +1,9 @@
+database_project: danizen-bakeoff
+app_project: danizen-bakeoff
+
+database_name: bakeoff
+region_name: us-east4
+zone_name: us-east4-b
+
+app_container: danizen/fastapi-asyncpg
+app_name: fapiasync

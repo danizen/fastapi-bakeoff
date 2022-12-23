@@ -62,6 +62,8 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Build and push bakeoff-java-spring:${{ env.VERSION }}
+        env:
+          JAR=${{ env.JAR }}
         uses: docker/build-push-action@v3
         with:
           context: "{{defaultContext}}:java-spring"

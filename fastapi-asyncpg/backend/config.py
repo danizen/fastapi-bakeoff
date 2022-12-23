@@ -1,29 +1,31 @@
 from functools import lru_cache
-from pydantic import BaseSettings, PostgresDsn, conint
+from typing import Optional
+from pydantic import BaseSettings, conint
 
 
 class Settings(BaseSettings):
-    database_url: PostgresDsn
+    pgdb_host: str
+    pgdb_database: Optional[str]
+    pgdb_port: Optional[conint(gt=0)]
+    pgdb_username: str
+    pgdb_password: str
     pool_min_size: conint(ge=0) = 0
     pool_max_size: conint(gt=0) = 2
     # pool_max_queries: Optional[conint(gt=0)] = None
 
     def connect_params(self):
-        port = self.database_url.port
+        port = self.pgdb_port
         if port is None:
             port = 5432
-        database = 'postgres'
-        path = self.database_url.path
-        if path and path[0] == '/':
-            path = path[1:]
-        if path:
-            database = path
+        database = self.pgdb_database
+        if database is None:
+            database = 'postgres'
         return {
-            'host': self.database_url.host,
+            'host': self.pgdb_host,
             'port': port,
             'database': database,
-            'user': self.database_url.user,
-            'password': self.database_url.password,
+            'user': self.pgdb_username,
+            'password': self.pgdb_password
         }
 
     class Config:

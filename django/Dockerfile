@@ -31,7 +31,7 @@ COPY --chown=app:app --from=build /usr/app/venv ./venv
 COPY --chown=app:app djproj ./djproj
 COPY --chown=app:app djapp ./djapp
 COPY --chown=app:app manage.py .
-EXPOSE 8000
+EXPOSE 8080
 USER app
 CMD . venv/bin/activate && \
-    uvicorn djproj.asgi:application --host 0.0.0.0 --workers 5
+    uvicorn djproj.asgi:application --host 0.0.0.0 --port 8080 --workers 5

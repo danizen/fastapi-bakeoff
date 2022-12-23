@@ -1,0 +1,8 @@
+region_name: us-east4
+zone_name: us-east4-b
+bucket_name: danizen-tfstate  
+bootstrap_project: danizen-bootstrap
+service_account_name: terraform
+service_account_users:
+  - user:gcpadmin@danizen.net
+  - user:dan@danizen.net

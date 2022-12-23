@@ -10,6 +10,14 @@ variable "database_name" {
   default = "bakeoff"
 }
 
-variable "project_prefix" {
+variable "app_project" {
+  type    = string
+}
+
+variable "database_project" {
+  type    = string
+}
+
+variable "app_container" {
   type    = string
 }

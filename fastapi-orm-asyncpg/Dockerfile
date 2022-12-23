@@ -26,6 +26,6 @@ WORKDIR /usr/app
 COPY --chown=app:app --from=build /usr/app/venv ./venv
 COPY --chown=app:app backend ./backend
 COPY --chown=app:app manage.py .
-EXPOSE 8000
+EXPOSE 8080
 USER app
-CMD . venv/bin/activate && python manage.py runserver 0.0.0.0
+CMD . venv/bin/activate && python manage.py runserver 0.0.0.0:8080

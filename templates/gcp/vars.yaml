@@ -2,8 +2,10 @@ database_project: danizen-bakeoff
 app_project: danizen-bakeoff
 
 database_name: bakeoff
+repository_name: bakeoff
 region_name: us-east4
 zone_name: us-east4-b
 
-app_container: danizen/fastapi-asyncpg
-app_name: fapiasync
+app_image: bakeoff-fastapi-orm-asyncpg
+app_name: fapiormasync
+vpcaccess_cidr: 10.8.0.0/28

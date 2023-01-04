@@ -10,6 +10,10 @@ variable "database_name" {
   default = "bakeoff"
 }
 
+variable "repository_name" {
+  default = "bakeoff"
+}
+
 variable "app_project" {
   type    = string
 }
@@ -18,6 +22,6 @@ variable "database_project" {
   type    = string
 }
 
-variable "app_container" {
+variable "app_image_tag" {
   type    = string
 }

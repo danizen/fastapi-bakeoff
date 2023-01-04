@@ -26,9 +26,19 @@ def positive_int_type(rawvalue):
 
 
 def command_runserver(opts):
-    if 'DATABASE_URL' not in os.environ:
-        print('This container requires DATABASE_URL environment variable', file=sys.stderr)
-        raise SystemExit(1)
+    required_vars = [
+        'PGDB_HOST',
+        'PGDB_DATABASE',
+        'PGDB_USERNAME',
+        'PGDB_PASSWORD'
+    ]
+    for required_var in required_vars:
+        if required_var not in os.environ:
+            print(
+                f'This container requires {required_var} environment variable',
+                file=sys.stderr
+            )
+            raise SystemExit(1)
     host_and_port = opts.host.split(':', maxsplit=1)
     if len(host_and_port) == 2:
         host, port = host_and_port

@@ -1,0 +1,7 @@
+site_name: Terraform Templates for bakeoff
+site_url: https://example.com/
+nav:
+    - Home: index.md
+    - Bootstrap: bootstrap.md
+    - Sql: sql.md
+theme: readthedocs

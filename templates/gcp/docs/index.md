@@ -1,4 +1,4 @@
-# Terraform Modules for GCP
+# Terraform Modules for FastAPI Bakeoff
 
 ## Background
 
@@ -7,24 +7,23 @@ architectures. These include asyncpg, SQLAlchemy on top of asyncpg, Django, and 
 
 ## GCP Summary
 
-This code includes three Terraform script sub-directories which are mean't to be run sequentially.
-The assumption here is that a company will have admins who provision projects appropriately in the
-resource hierarchy, so this will not create projects.
+This code includes three sub-directories which contain Terraform Stacks that are meant to be run sequentially. The assumption here is that a company will have admins who provision projects appropriately in the resource hierarchy, so this will not create projects.
 
-## Stack sub-directories
+## Terraform Stacks
 
-* One project, `0-bootstrap`, to create the backend state storage and service account for 
+* `0-bootstrap` creates the backend state storage and service account for 
   terraform. This one must be run by a principal with rights to IAM and service accounts.
+  Because it is a bootstrap project, it does not use a remote backend.
 
-* One project, `1-sql`, creates some bakend requirements for the microservice, these include:
+* `1-infrastructure` creates some backend requirements for the microservice, these include:
   - An Cloud SQL instance running PostgreSQL
   - VPC Ingress for that Database
   - A Secret Manager secret for the Cloud SQL instance
-  - A Artifact Registry repository for the container image to run.
+  - A Artifact Registry repository for the container image to run
+  - For simplicity, a custom VPC is not used - it uses the default VPC in the project
 
-* The final project, `2-app`, is meant to be run after an images built from
-  the sub-directories in https://github.com/fastapi-bakeoff are transferred into the artifact registry.
+*  `2-app` is meant to be run after images built from the sub-directories in https://github.com/fastapi-bakeoff are transferred into the artifact registry.
 
 ## Managing Variables with Terragrunt
 
-This repository is setup to use terragrunt to manage input variables.  The bootstrap modules is parameterized by `bootstrap.yaml`, and the others are parameterized by `vars.yaml`.
+This repository is setup to use terragrunt to manage input variables.  The bootstrap modules is parameterized by `bootstrap.yaml`, and the others are parameterized by `vars.yaml`.  The parent directory and each stack sub-directory contain a file `terragrunt.hcl` which defines how this works.

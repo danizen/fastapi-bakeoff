@@ -11,7 +11,7 @@ sections:
     - outputs
 
 output:
-  file: ../docs/sql.md
+  file: ../docs/infrastructure.md
   mode: inject
   template: |-
     <!-- BEGIN_TF_DOCS -->

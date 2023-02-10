@@ -2,8 +2,7 @@ site_name: Terraform Templates for bakeoff
 site_url: https://example.com/
 nav:
     - Home: index.md
-    - Howto: howto.md
     - Bootstrap: bootstrap.md
-    - Infrastructure: infrastructure.md
-    - CloudRun Service: app.md
+    - Infrastructure: infrastucture.md
+    - CloudRun Service: microservice.md
 theme: readthedocs

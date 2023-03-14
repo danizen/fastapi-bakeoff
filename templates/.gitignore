@@ -2,3 +2,4 @@ backend.tf
 *.tfstate
 .terraform.lock.hcl
 .terraform.tfstate.lock.info
+site/

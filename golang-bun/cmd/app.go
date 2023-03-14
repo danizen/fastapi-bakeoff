@@ -47,27 +47,8 @@ func main() {
 			schema.EncodeError(c, err)
 			return
 		}
-		var response = schema.ContactsResponse{
-			Count: 2,
-			Results: []schema.Contact{
-				{
-					ID:        1,
-					FirstName: "Sonya",
-					LastName:  "Liyung",
-					ContactType: schema.ContactType{
-						ID: 2, Name: "Coworkers",
-					},
-				},
-				{
-					ID:        3,
-					FirstName: "Dan",
-					LastName:  "Davis",
-					ContactType: schema.ContactType{
-						ID: 2, Name: "Coworkers",
-					},
-				},
-			},
-		}
+		var response = schema.ContactsResponse{}
+		response.Fake()
 		c.JSON(http.StatusOK, response)
 	})
 	app.Run()

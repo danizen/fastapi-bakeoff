@@ -27,13 +27,8 @@ func main() {
 		c.JSON(http.StatusOK, response)
 	})
 	app.GET("/types/", func(c *gin.Context) {
-		var response = schema.ContactTypesResponse{
-			Count: 3, Results: []schema.ContactType{
-				{ID: 0, Name: "Relatives"},
-				{ID: 1, Name: "Friends"},
-				{ID: 2, Name: "Coworkers"},
-			},
-		}
+		var response = schema.ContactTypesResponse{}
+		response.Fake()
 		c.JSON(http.StatusOK, response)
 	})
 	app.GET("/contacts/:contact_id/", func(c *gin.Context) {
@@ -42,22 +37,8 @@ func main() {
 			schema.EncodeError(c, err)
 			return
 		}
-		var response = schema.Contact{
-			ID:        params.ContactID,
-			FirstName: "Sonya",
-			LastName:  "Liyung",
-			ContactType: schema.ContactType{
-				ID: 2, Name: "Coworkers",
-			},
-			PhoneNumber: []schema.PhoneNumber{
-				"222-182-1828",
-				"222-129-7173",
-			},
-			Email: []schema.Email{
-				"sonya.liyung@capitalone.com",
-				"sonayali@gmail.com",
-			},
-		}
+		var response = schema.Contact{}
+		response.Fake()
 		c.JSON(http.StatusOK, response)
 	})
 	app.GET("/contacts/", func(c *gin.Context) {
